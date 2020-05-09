@@ -1,0 +1,292 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>分割畫面小幫手 Jitsi Screen :: 線上揪松 Jothon Online</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="//meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
+</head>
+<body>
+<form method="post" id="jitsi-form">
+    Jitsi URL: <input size="100" type="text" name="url" value="https://meet.jit.si/jitsiscreentest"><br>
+    Password: <input type="password" name="password"><br>
+    Bot Name: <input type="text" name="bot-name" value="Jothon Helper"><br>
+    <button type="submit">Go</button>
+</form>
+<h1>Screen</h1>
+<ol id="screen-list"></ol>
+<form method="post" id="add-screen">
+    User：<select id="screen-people"></select><br>
+    Width: <input type="text" id="screen-width" value="800">
+    Height: <input type="text" id="screen-height" value="600">
+    <br>
+    <button type="submit">Add Screen</button>
+</form>
+<h1>User</h1>
+<ol id="user-list"></ol>
+<button type="button" id="share-desktop">Share your desktop</button>
+<script>
+var matches = location.search.match(/\?url=(.*)/);
+if (matches) {
+    $('[name="url"]').val(decodeURIComponent(matches[1]));
+}
+
+var screens = []; 
+$('#add-screen').submit(function(e){
+        e.preventDefault();
+        var id = screens.length;
+        var user_id = $('#screen-people').val();
+        var screen = {};
+        var width = parseInt($('#screen-width').val());
+        var height = parseInt($('#screen-height').val());
+        var win = window.open('', 'screen-' + id, config='height=' + (height + 100) + ',width=' + (width + 100));
+        win.document.write('<center><video id="video" autoplay="1" muted style="height: ' + height + 'px; width: ' + width + 'px;border: 1px solid black" onclick="this.play()"></video></center>');
+        win.document.title = 'Screen ' + id;
+        $('#video', win.document).ready(function(){
+            var tracks = room.participants[user_id].getTracksByMediaType('video');
+            var video_dom = win.document.getElementById('video');
+            if (tracks.length) {
+                tracks[0].attach(win.document.getElementById('video'));
+                win.document.getElementById('video').__track = tracks[0];
+                win.document.getElementById('video').play();
+            }
+        });
+
+        screen.win = win;
+        screen.user_id = user_id;
+        var li_dom = $('<li></li>');
+        li_dom.append($('<span></span>').text('Screen ' + id));
+        li_dom.append($('<select></select>').addClass('screen-people-select'));
+        li_dom.append($('<form></form>').addClass('switch-form').css('display', 'inline').append(' Swap ').append($('<select></select>').addClass('switch-select')).append($('<button></button>').attr('type', 'submit').text('swap')));
+        li_dom.data('id', id);
+        li_dom.attr('id', 'screen-list-' + id);
+        $('#screen-list').append(li_dom);
+        screens.push(screen);
+        update_user_list();
+		if (id == 0)  {
+			room.selectParticipant(user_id);
+		}
+        $('.switch-select').each(function(){
+            $(this).html('');
+            var id = $(this).parents('li').data('id');
+            for (var sid in screens) {
+                if (sid == id) {
+                    continue;
+                }
+                $(this).append($('<option></option>').text(sid));
+            }
+        });
+});
+
+const initOptions = {
+    disableAudioLevels: false,
+
+    disableSimulcast: true,
+    // The ID of the jidesha extension for Chrome.
+    desktopSharingChromeExtId: 'mbocklcggfhnbahlnepmldehdhpjfcjp',
+
+    // Whether desktop sharing should be disabled on Chrome.
+    desktopSharingChromeDisabled: false,
+
+    // The media sources to use when using screen sharing with the Chrome
+    // extension.
+    desktopSharingChromeSources: [ 'screen', 'window' ],
+
+    // Required version of Chrome extension
+    desktopSharingChromeMinExtVersion: '0.1',
+
+    // Whether desktop sharing should be disabled on Firefox.
+    desktopSharingFirefoxDisabled: false,
+};
+
+var jitsi_domain;
+var jitsi_room;
+$('#jitsi-form').submit(function(e){
+        e.preventDefault();
+        var matches = $('[name="url"]').val().match('^https://([^/]*)/(.*)$');
+        if (!matches) {
+            alert('invalid URL');
+            return;
+        }
+        $('#jitsi-form').hide();
+        window.history.pushState('', '', '?url=' + encodeURIComponent(matches[0]));
+        jitsi_domain = matches[1];
+        jitsi_room = matches[2].toLowerCase();
+
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+        JitsiMeetJS.init(initOptions);
+		const options = {
+			hosts: {
+				domain: jitsi_domain,
+				muc: 'conference.' + jitsi_domain,
+				focus: 'focus.' + jitsi_domain,
+			},
+			bosh: 'wss://' + jitsi_domain + '/xmpp-websocket?room=' + jitsi_room,
+			websocket: 'wss://' + jitsi_domain + '/xmpp-websocket?room=' + jitsi_room,
+
+
+		   // The name of client node advertised in XEP-0115 'c' stanza
+		   clientNode: 'http://jitsi.org/jitsimeet'
+		};
+        connection = new JitsiMeetJS.JitsiConnection(null, null, options);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('connection failed'); });
+    if ($('[name="password"]').val()) {
+        connection.connect({
+            password:$('[name="password"]').val(),
+        });
+    } else {
+        connection.connect();
+    }
+});
+
+var update_track = function(){
+    for (var id in screens) {
+        var win = screens[id].win;
+        var user_id = screens[id].user_id;
+        var video_dom = win.document.getElementById('video');
+        tracks = room.participants[user_id].getTracksByMediaType('video');
+        if (tracks.length) {
+            var old_track = video_dom.__track;
+            if (old_track.ssrc != tracks[0].ssrc) {
+                old_track.detach(video_dom);
+                tracks[0].attach(video_dom);
+                video_dom.__track = tracks[0];
+            }
+        }
+    }
+};
+
+var update_user_list = function(){
+    $('#user-list').html('');
+    $('#screen-people').html('');
+        $('#screen-list select.screen-people-select').each(function(){
+        $(this).html('');
+    });
+    var li_dom = $('<li></li>');
+    li_dom.html('me. ' + $('[name="bot-name"]').val() + ' @ ' + jitsi_room);
+    $('#user-list').append(li_dom);
+
+    for (var id in room.participants) {
+        var li_dom = $('<li></li>');
+        li_dom.html(id + '. ' + room.participants[id].getDisplayName());
+        $('#user-list').append(li_dom);
+        $('#screen-people').append($('<option></option>').attr('value', id).text(id + '. ' + room.participants[id].getDisplayName()));
+        $('#screen-list select.screen-people-select').each(function(){
+            var li_dom = $(this).parents('li');
+            var option_dom = $('<option></option>').attr('value', id).text(id + '. ' + room.participants[id].getDisplayName());
+            if (screens[li_dom.data('id')].user_id == id) {
+                option_dom.prop('selected', true);
+            }
+            $(this).append(option_dom);
+        });
+
+    }
+};
+
+$('#screen-list').on('submit', '.switch-form', function(e){
+        e.preventDefault();
+        var li_dom = $(this).parents('li');
+        var old_id = li_dom.data('id');
+        var new_id = $('.switch-select', this).val();
+        old_value = screens[old_id].user_id;
+        new_value = screens[new_id].user_id;
+        $('#screen-list-' + old_id + ' select.screen-people-select').val(new_value).change();
+        $('#screen-list-' + new_id + ' select.screen-people-select').val(old_value).change();
+});
+
+$('#screen-list').on('change', '.screen-people-select', function(e){
+    var li_dom = $(this).parents('li');
+    var id = li_dom.data('id');
+    var user_id = $(this).val();
+    if (id == 0) {
+        room.selectParticipant(user_id);
+    }
+    if (user_id != screens[id].user_id) {
+        var tracks = room.participants[user_id].getTracksByMediaType('video');
+        var win = screens[id].win;
+        if (tracks.length) {
+            if (win.document.getElementById('video').__track) {
+                win.document.getElementById('video').__track.detach(win.document.getElementById('video'));
+            }
+            tracks[0].attach(win.document.getElementById('video'));
+            win.document.getElementById('video').play();
+        }
+        screens[id].user_id = user_id;
+    }
+});
+
+var room;
+var onConnected = function() {
+    var confOptions = {
+        openBridgeChannel: true,
+        confID: jitsi_domain + '/' + jitsi_room,
+    };
+    room = connection.initJitsiConference(jitsi_room, confOptions);
+    room.setDisplayName($('[name="bot-name"]').val());
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_FAILED,
+        function(error) {
+            alert("CONFERENCE_FAILED:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_ERROR,
+        function(error) {
+            alert("CONFERENCE_ERROR:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+        function(){
+            update_user_list();
+            room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, update_track);
+            room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, update_track);
+        });
+
+    if ($('[name="password"]').val()) {
+        room.join($('[name="password"]').val());
+    } else {
+        room.join();
+    }
+}
+
+onLocalTracks = function(tracks) {
+    for (let i = 0; i < tracks.length; i++) {
+        room.addTrack(tracks[i]);
+    }
+};
+
+$('#share-desktop').click(function(e){
+    JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+    .then(onLocalTracks)
+    .catch(error => {
+    });
+});
+
+$(window).bind('beforeunload', unload);
+$(window).bind('unload', unload);
+function unload() {
+    if (room) {
+        room.leave();
+    }
+    if (connection) {
+		connection.disconnect();
+    }
+
+	for (var screen of screens) {
+		screen.win.close();
+	}
+}
+
+</script>
+</body>
+</html>
