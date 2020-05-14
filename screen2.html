@@ -640,6 +640,18 @@ var update_screen_video = function(){
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.hide();
+            } else if (user_id.match(/^camera-/)) {
+                var device_id = user_id.split('-')[1];
+                get_local_video_track(device_id, function(track){
+                    var old_track = video_dom.__track;
+                    if (old_track) {
+                        old_track.detach(video_dom[0]);
+                    }
+                    video_dom.show();
+                    track.attach(video_dom[0]);
+                    video_dom.__track = track;
+                    video_dom[0].play();
+                });
             } else {
                 if ('undefined' === typeof(room.participants[user_id])) {
                     return;
@@ -680,6 +692,12 @@ var update_user_list = function(){
         option_dom.html('不顯示').val('none');
         $(this).append(option_dom);
 
+        for (var device of device_list.video) {
+            var option_dom = $('<option></option>');
+            option_dom.html('Camera ' + device.label).val('camera-' + device.deviceId);
+            $(this).append(option_dom);
+        }
+
         if (room) {
             for (var id in room.participants) {
                 var option_dom = $('<option></option>');
@@ -703,12 +721,15 @@ var update_user_list = function(){
 };
 
 var room;
+var device_list = {audio: [], video: []};
+
 var update_devices = function(tracks) {
-    console.log(tracks);
     if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
         JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
             $('#output-video').html('');
             $('#output-audio').html('');
+            device_list.audio = [];
+            device_list.video = [];
             $('#output-video').append($('<option></option>').attr('val', 'none').text('不使用'));
             $('#output-audio').append($('<option></option>').attr('val', 'none').text('不使用'));
             var has_video = false;
@@ -717,10 +738,12 @@ var update_devices = function(tracks) {
                 if (device.kind == 'audioinput' && device.label != '') {
                     $('#output-audio').append($('<option></option>').attr('val', device.deviceId).text(device.label));
                     has_audio = true;
+                    device_list.audio.push(device);
                 }
                 if (device.kind == 'videoinput' && device.label != '') {
                     $('#output-video').append($('<option></option>').attr('val', device.deviceId).text(device.label));
                     has_video = true;
+                    device_list.video.push(device);
                 }
             }
             if (has_audio) {
@@ -733,6 +756,7 @@ var update_devices = function(tracks) {
             }
         });
     }
+    update_user_list();
 };
 
 var onConnected = function() {
@@ -776,6 +800,16 @@ var onConnected = function() {
         room.join();
     }
 }
+
+function get_local_video_track(device_id, callback) {
+    JitsiMeetJS.createLocalTracks({ devices: [ 'video' ], cameraDeviceId: device_id })
+    .then(function(tracks){
+        callback(tracks[0]);
+    })
+    .catch(error => {
+        throw error;
+    });
+};
 
 onLocalTracks = function(tracks) {
     for (let i = 0; i < tracks.length; i++) {
