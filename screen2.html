@@ -388,7 +388,7 @@ $('#form-screen-choose').submit(function(e){
     var user_list = get_list_from_content(current_data.scenes[scene_id].content);
     user_list.map(function(id){
         $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
-        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('id', 'user-select-' + id));
+        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).addClass('user-select-' + id));
         $('.custom-box', div_dom).append('<br>');
     });
     div_dom.attr('id', 'screen-choose-body-' + idx);
@@ -396,7 +396,9 @@ $('#form-screen-choose').submit(function(e){
     $('#screen-choose-body-area').append(div_dom);
     update_user_list();
     user_list.map(function(id){
-        $('#user-select-' + id).val($('#form-screen-choose [name="user-select[' + id + ']"]').val());
+        $('.user-select-' + id).each(function(){
+            $(this).val($('#form-screen-choose [name="user-select[' + id + ']"]').val());
+        });
     });
 
     $('#screen-choose-body-area .screen-choose-body').hide();
