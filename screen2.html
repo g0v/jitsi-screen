@@ -1,0 +1,731 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>分割畫面小幫手 :: 線上揪松 Jothon Online</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="//jitsi.jothon.online/libs/lib-jitsi-meet.min.js"></script>
+<style>
+body {
+    overflow: hidden;
+}
+#card-connect {
+	position: absolute:
+	top: 0%;
+	left: 0%;
+	width: 20%;
+	height: 50%;
+}
+#card-member{
+	position: absolute:
+	top: 50%;
+	left: 0%;
+	width: 20%;
+	height: 50%;
+}
+#card-scene-choose {
+	position: absolute;
+	top: 0%;
+	left: 20%;
+	width: 40%;
+	height: 50%;
+}
+#card-screen-choose {
+	position: absolute;
+	top: 50%;
+	left: 20%;
+	width: 40%;
+	height: 50%;
+}
+#card-screen-choose .row {
+    height: 100%;
+}
+#card-screen-choose #screen-list-div {
+    overflow: scroll;
+    height: 100%;
+}
+#card-scene-editor{
+	position: absolute;
+	top: 0%;
+	left: 60%;
+	width: 40%;
+	height: 50%;
+}
+#card-scene-preview {
+	position: absolute;
+	top: 50%;
+	left: 60%;
+	width: 40%;
+	height: 50%;
+}
+#card-scene-preview .card-body {
+    padding: 0;
+}
+#form-scene-editor {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+#form-scene-editor #div-scene-editor-name {
+	flex: 0;
+}
+#form-scene-editor #textarea-scene-editor-content {
+	flex: 1;
+}
+#card-scene-choose .card-body {
+	overflow: scroll;
+}
+#preview-iframe {
+    width: 100%;
+    height: 100%;
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="card-connect">
+  <div class="card-header">
+	登入
+  </div>
+  <div class="card-body">
+    <form method="post" id="jitsi-form">
+		Jitsi URL: <input type="text" name="url" value="https://meet.jit.si/jothontest"><br>
+		Password: <input type="password" name="password"><br>
+		Bot Name: <input type="text" name="bot-name" value="Jothon Helper"><br>
+		<button type="submit">Go</button>
+	</form>
+  </div>
+</div>
+<div class="card" id="card-member">
+  <div class="card-header">
+	  成員
+  </div>
+  <div class="card-body">
+      <ul id="user-list"></ul>
+	</p>
+  </div>
+</div>
+<div class="card" id="card-scene-choose">
+  <div class="card-header">
+	  場景列表
+  </div>
+  <div class="card-body">
+	<ol id="scene-list"></ol>
+  </div>
+</div>
+<div class="card" id="card-screen-choose">
+  <div class="card-header">
+	  畫面選擇
+	  <button class="btn btn-primary btn-sm" type="button" id="btn-screen-choose-add">新增畫面</button>
+  </div>
+  <div class="card-body">
+      <div class="row">
+          <div class="col-3" id="screen-list-div">
+              <div class="nav flex-column nav-pills" id="screen-list" role="tablist" aria-orientation="vertical">
+              </div>
+              <script type="text/html" id="tmpl-screen-list-item">
+                    <a class="nav-link screen-item" href="#" role="tab"></a>
+              </script>
+          </div>
+          <div class="col-9" id="screen-choose-body-area">
+              <div class="screen-choose-body" id="screen-choose-body-new">
+                  <h3>新增畫面</h3>
+                  <form id="form-screen-choose">
+                      選擇場景：<select id="screen-chooser"></select><br>
+                      畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
+                      尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
+                      <div class="custom-box"></div>
+                      <button type="submit">新增</button>
+                  </form>
+              </div>
+              <script type="text/html" id="tmpl-screen-choose-body">
+              <div class="screen-choose-body">
+                  <h3>新增畫面</h3>
+                  <form class="form-screen-choose">
+                      視窗動作：<button class="btn-focus">最上層</button>
+                        <button class="btn-reopen">重新開啟</button><br>
+                      選擇場景：<span class="screen-chooser"></span><br>
+                      畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
+                      尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
+                      <div class="custom-box"></div>
+                  </form>
+              </div>
+              </script>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="card" id="card-scene-editor">
+  <div class="card-header">
+	  場景編輯
+	  <button class="btn btn-primary btn-sm" type="button" id="btn-scene-editor-preview">更新預覽</button>
+	  <button class="btn btn-primary btn-sm" type="button">儲存</button>
+  </div>
+  <div class="card-body">
+		<form id="form-scene-editor">
+			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="inputGroup-sizing-sm">場景名稱</span>
+				</div>
+				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+			</div>
+			<textarea class="form-control" aria-label="With textarea" name="content" id="textarea-scene-editor-content"></textarea>
+		</form>
+  </div>
+</div>
+<div class="card" id="card-scene-preview">
+  <div class="card-header">
+      <form id="resize-form" class="form-inline" style="margin-block-end: 0">
+	  場景預覽
+          <input type="text" name="width" value="1600" size="5"> x 
+          <input type="text" name="height" value="900" size="5"> 
+          <button class="btn btn-primary btn-sm" type="submit">更新預覽尺寸</button>
+      </form>
+  </div>
+  <div class="card-body">
+      <iframe id="preview-iframe"></iframe>
+  </div>
+</div>
+<script>
+var default_data = {
+	scenes: {
+		"1": {
+			"name": "單人全螢幕",
+			"content": "<div class=\"video-box\" data-id=\"1\"></div>",
+		},
+        "2" : {
+            "name": "四分割螢幕",
+            "content": "<style>.video-box { width:50%; height:50%; float:left;  } </style>"+
+                "<div class=\"video-box\" data-id=\"1\"></div>"+
+                "<div class=\"video-box\" data-id=\"2\"></div>"+
+                "<div class=\"video-box\" data-id=\"3\"></div>"+
+                "<div class=\"video-box\" data-id=\"4\"></div>"
+        }
+	},
+	screens: [],
+};
+var current_data = null;
+var windows = {};
+
+var load_data = function(data){
+	for (var scene_id in data.scenes) {
+		var li_dom = $('<li></li>');
+		var scene = data.scenes[scene_id];
+		li_dom.text(scene.name);
+		li_dom.append($('<button></button>').text('編輯預覽').addClass('btn btn-primary btn-sm btn-preview'));
+		li_dom.data('id', scene_id);
+		$('#scene-list').append(li_dom);
+	}
+    current_data = data;
+    update_screen_choose();
+};
+
+$(function(){
+    load_data(default_data);
+});
+
+$('#screen-chooser').change(function(){
+    var scene_id = $('#screen-chooser').val();
+    var user_list = get_list_from_content(current_data.scenes[scene_id].content);
+    var div_dom = $('#form-screen-choose');
+    $('.custom-box', div_dom).html('');
+    user_list.map(function(id){
+        $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
+        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('name', 'user-select[' + id + ']'));
+        $('.custom-box', div_dom).append('<br>');
+    });
+    update_user_list();
+});
+
+var update_screen_choose = function(){
+    $('#screen-chooser').html('');
+	for (var scene_id in current_data.scenes) {
+        var option_dom = $('<option></option>');
+		var scene = current_data.scenes[scene_id];
+        option_dom.attr('value', scene_id).text(scene.name);
+        $('#screen-chooser').append(option_dom);
+	}
+    $('#screen-chooser').change();
+    update_user_list();
+};
+
+var update_preview_content = function(content){
+    $($('#preview-iframe')[0].contentDocument.body).html(content);
+    var seq = 0;
+    $('.video-box', $('#preview-iframe')[0].contentDocument.body).each(function(){
+        var id = $(this).data('id');
+
+        // draw fake video
+        var canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 450;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 800, 450);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'black';
+        ctx.font = 'normal 200px Arial';
+
+        var metric = ctx.measureText(id);
+        text_height = metric.actualBoundingBoxAscent + metric.actualBoundingBoxDescent;
+
+        ctx.strokeStyle = 'green';
+        for (var x = -canvas.height; x < canvas.width; x += 50) {
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x + canvas.height, canvas.height);
+            ctx.stroke();
+
+            ctx.moveTo(canvas.width - x, 0);
+            ctx.lineTo(canvas.width - x - canvas.height, canvas.height);
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(0, 0);
+        ctx.lineTo(canvas.width, 0);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+
+        var row = 0;
+        ctx.fillText(id, canvas.width / 2, canvas.height / 2 + text_height / 2);
+
+        var width = canvas.width;
+        var height = canvas.height;
+
+        var body_width = $(this)[0].scrollWidth;
+        var body_height = $(this)[0].scrollHeight;
+
+        var ratio = width / height;
+        var actual_width, actual_height;
+        if (body_height == 0 || body_height * ratio > body_width) {
+            actual_width = body_width;
+            actual_height = Math.floor(body_width / ratio);
+        } else {
+            actual_width = Math.floor(body_height * ratio);
+            actual_height = body_height;
+        }
+        var canvas_dom = $(canvas);
+        canvas_dom.css({
+            position: 'relative',
+            width: actual_width,
+            height: actual_height,
+        });
+
+        $(this).append(canvas_dom);
+
+    });
+};
+
+var update_screen_data = function(){
+    $('#screen-list').html('');
+    for (var idx in current_data.screens) {
+        var screen = current_data.screens[idx];
+        var title = '畫面 ' + idx;
+        if (screen.title) {
+            title += ' : ' + screen.title;
+        }
+        var item_dom = $($('#tmpl-screen-list-item').html()).text(title);
+        item_dom.attr('id', 'screen-item-' + idx);
+        $('#screen-list').append(item_dom);
+    }
+};
+
+var check_resize = function(win, width, height){
+    if (win.innerWidth == 0 || win.outerWidth == 0) {
+        setTimeout(function(){ check_resize(win, width, height); }, 100);
+        return;
+    }
+    win.resizeTo(width + win.outerWidth - win.innerWidth, height + win.outerHeight - win.innerHeight);
+};
+
+var get_list_from_content = function(content){
+    var dom = $('<div></div>').append($(content));
+    var list_map = {};
+    $('.video-box', dom).each(function(){
+        var id = $(this).data('id');
+        if ('undefined' === typeof(id)) {
+            return;
+        }
+        list_map[id] = true;
+    });
+    var list = [];
+    for (var id in list_map) {
+        list.push(id);
+    }
+    return list;
+};
+
+$('#form-screen-choose').submit(function(e){
+	e.preventDefault();
+    var scene_id = $('#screen-chooser').val();
+    var title = $('[name="title"]', this).val();
+    var width = parseInt($('[name="width"]', this).val());
+    var height = parseInt($('[name="height"]', this).val());
+    var user_select = {};
+
+    $('#form-screen-choose .user-select').each(function(){
+        user_select[$(this).data('id')] = $(this).val();
+    });
+
+    var idx = current_data.screens.length;
+    current_data.screens.push({
+        scene_id: scene_id,
+        title: title,
+        width: width,
+        height: height,
+    });
+    var div_dom = $($('#tmpl-screen-choose-body').html());
+    $('h3', div_dom).text('畫面 ' + idx + ' ' + title);
+    $('.screen-chooser', div_dom).text(current_data.scenes[scene_id].name);
+    $('[name="title"]', div_dom).val(title);
+    $('[name="width"]', div_dom).val(width);
+    $('[name="height"]', div_dom).val(height);
+    var user_list = get_list_from_content(current_data.scenes[scene_id].content);
+    user_list.map(function(id){
+        $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
+        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('id', 'user-select-' + id));
+        $('.custom-box', div_dom).append('<br>');
+    });
+    div_dom.attr('id', 'screen-choose-body-' + idx);
+
+    $('#screen-choose-body-area').append(div_dom);
+    update_user_list();
+    user_list.map(function(id){
+        $('#user-select-' + id).val($('#form-screen-choose [name="user-select[' + id + ']"]').val());
+    });
+
+    $('#screen-choose-body-area .screen-choose-body').hide();
+    $('.btn-reopen', div_dom).hide();
+    div_dom.show();
+    update_screen_data();
+    $('.screen-item').removeClass('active');
+    $('#screen-item-' + idx).addClass('active');
+
+    var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
+    win.document.title = '畫面 ' + idx;
+    win.onunload = function(){
+        $('#screen-choose-body-' + idx + ' .btn-reopen').show();
+        $('#screen-choose-body-' + idx + ' .btn-focus').hide();
+    };
+    check_resize(win, width, height);
+    $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
+    $('.video-box', win.document).ready(function(){
+        update_screen_video();
+    });
+    windows[idx] = win;
+
+    // XXX
+});
+
+$('#screen-choose-body-area').on('click', '.btn-focus', function(e){
+    e.preventDefault();
+    var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
+    windows[idx].focus();
+});
+
+$('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
+    e.preventDefault();
+    var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
+    width = current_data.screens[idx].width;
+    height = current_data.screens[idx].height;
+    scene_id = current_data.screens[idx].scene_id;
+    var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
+    win.document.title = '畫面 ' + idx;
+    win.onunload = function(){
+        $('#screen-choose-body-' + idx + ' .btn-reopen').show();
+        $('#screen-choose-body-' + idx + ' .btn-focus').hide();
+    };
+    $('#screen-choose-body-' + idx + ' .btn-reopen').hide();
+    $('#screen-choose-body-' + idx + ' .btn-focus').show();
+    check_resize(win, width, height);
+    $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
+    current_data.scenes[scene_id].win = win;
+    windows[idx] = win;
+    update_screen_video();
+});
+
+$('#btn-screen-choose-add').click(function(e){
+    e.preventDefault();
+    $('#screen-choose-body-area .screen-choose-body').hide();
+    $('.screen-item').removeClass('active');
+    $('#screen-choose-body-new').show();
+});
+
+$('#screen-list').on('click', '.screen-item', function(e){
+    e.preventDefault();
+    $('#screen-choose-body-area .screen-choose-body').hide();
+    $('.screen-item').removeClass('active');
+    var idx = $(this).attr('id').split('-')[2];
+    $('#screen-choose-body-' + idx).show();
+    $(this).addClass('active');
+});
+
+$('#scene-list').on('click', '.btn-preview', function(e){
+	e.preventDefault();
+    var scene = current_data.scenes[$(this).parents('li').data('id')];
+    $('#form-scene-editor [name="name"]').val(scene.name);
+    $('#form-scene-editor [name="content"]').val(scene.content);
+    update_preview_content(scene.content);
+});
+
+$('#btn-scene-editor-preview').click(function(e){
+    var content = $('#form-scene-editor [name="content"]').val();
+    update_preview_content(content);
+});
+
+var update_preview_size = function(){
+    var width = parseInt($('#card-scene-preview .card-header [name="width"]').val());
+    var height = parseInt($('#card-scene-preview .card-header [name="height"]').val());
+
+    var body_width = $('#card-scene-preview .card-body')[0].scrollWidth;
+    var body_height = $('#card-scene-preview .card-body')[0].scrollHeight;
+
+    var ratio = width / height;
+    var actual_width, actual_height;
+    if (body_height * ratio > body_width) {
+        actual_width = body_width;
+        actual_height = body_width / ratio;
+    } else {
+        actual_width = body_height * ratio;
+        actual_height = body_height;
+    }
+    $('#preview-iframe').width(actual_width);
+    $('#preview-iframe').height(actual_height);
+    $($('#preview-iframe')[0].contentDocument.body).css('zoom', actual_width / width).css('margin', 0);
+};
+
+update_preview_size();
+$('#resize-form').submit(function(e){
+    e.preventDefault();
+    update_preview_size();
+});
+
+var matches = location.search.match(/\?url=(.*)/);
+if (matches) {
+    $('[name="url"]').val(decodeURIComponent(matches[1]));
+}
+
+const initOptions = {
+    disableAudioLevels: false,
+
+    disableSimulcast: true,
+    // The ID of the jidesha extension for Chrome.
+    desktopSharingChromeExtId: 'mbocklcggfhnbahlnepmldehdhpjfcjp',
+
+    // Whether desktop sharing should be disabled on Chrome.
+    desktopSharingChromeDisabled: false,
+
+    // The media sources to use when using screen sharing with the Chrome
+    // extension.
+    desktopSharingChromeSources: [ 'screen', 'window' ],
+
+    // Required version of Chrome extension
+    desktopSharingChromeMinExtVersion: '0.1',
+
+    // Whether desktop sharing should be disabled on Firefox.
+    desktopSharingFirefoxDisabled: false,
+};
+
+var jitsi_domain;
+var jitsi_room;
+var connection;
+$('#jitsi-form').submit(function(e){
+        e.preventDefault();
+        var matches = $('[name="url"]').val().match('^https://([^/]*)/(.*)$');
+        if (!matches) {
+            alert('網址不正確');
+            return;
+        }
+        $('#jitsi-form').hide();
+        window.history.pushState('', '', '?url=' + encodeURIComponent(matches[0]));
+        jitsi_domain = matches[1];
+        jitsi_room = matches[2].toLowerCase();
+
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+        JitsiMeetJS.init(initOptions);
+		const options = {
+			hosts: {
+				domain: jitsi_domain,
+				muc: 'conference.' + jitsi_domain,
+				focus: 'focus.' + jitsi_domain,
+			},
+			bosh: 'wss://' + jitsi_domain + '/xmpp-websocket',
+			websocket: 'wss://' + jitsi_domain + '/xmpp-websocket',
+
+
+		   // The name of client node advertised in XEP-0115 'c' stanza
+		   clientNode: 'http://jitsi.org/jitsimeet'
+		};
+        options.bosh += '?room=' + jitsi_room;
+        options.websocket += '?room=' + jitsi_room;
+        connection = new JitsiMeetJS.JitsiConnection(null, null, options);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('連線失敗'); });
+    if ($('[name="password"]').val()) {
+        connection.connect({
+            password:$('[name="password"]').val(),
+        });
+    } else {
+        connection.connect();
+    }
+});
+
+$('#screen-choose-body-area').on('change', '.user-select', function(e){
+    update_screen_video();
+});
+
+var update_screen_video = function(){
+    for (var idx in windows) {
+        var user_select = {};
+        $('#screen-choose-body-' + idx + ' .user-select').each(function(){
+            user_select[$(this).data('id')] = $(this).val();
+        });
+        win = windows[idx];
+        $('.video-box', win.document).each(function(){
+            var data_id = $(this).data('id');
+            user_id = user_select[$(this).data('id')];
+            if (!$('video', this).length) {
+                $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
+            }
+            var video_dom = $('video', this);
+            if (user_id == 'none') {
+                var old_track = video_dom.__track;
+                if (old_track) {
+                    old_track.detach(video_dom[0]);
+                }
+                video_dom.hide();
+            } else {
+                if ('undefined' === typeof(room.participants[user_id])) {
+                    return;
+                }
+
+                var tracks = room.participants[user_id].getTracksByMediaType('video');
+                var old_track = video_dom.__track;
+                if (old_track) {
+                    old_track.detach(video_dom[0]);
+                }
+                video_dom.show();
+                if (tracks.length) {
+                    tracks[0].attach(video_dom[0]);
+                    video_dom.__track = tracks[0];
+                    video_dom[0].play();
+                }
+            }
+        });
+    }
+};
+
+var update_user_list = function(){
+    $('#user-list').html('');
+    var li_dom = $('<li></li>');
+    li_dom.html('me. ' + $('[name="bot-name"]').val() + ' @ ' + jitsi_room);
+    $('#user-list').append(li_dom);
+
+    $('.user-select').each(function(){
+        var current_user = null;
+        if (!$(this).is('.new')) {
+            current_user = $(this).val();
+        } else {
+            $(this).removeClass('new');
+        }
+        
+        $(this).html('');
+        option_dom = $('<option></option>');
+        option_dom.html('不顯示').val('none');
+        $(this).append(option_dom);
+
+        if (room) {
+            for (var id in room.participants) {
+                var option_dom = $('<option></option>');
+                option_dom.html(id + '. ' + room.participants[id].getDisplayName()).val(id);
+                $(this).append(option_dom);
+            }
+        }
+
+        if (null !== current_user) {
+            $(this).val(current_user);
+        }
+    });
+
+    if (room) {
+        for (var id in room.participants) {
+            var li_dom = $('<li></li>');
+            li_dom.html(id + '. ' + room.participants[id].getDisplayName());
+            $('#user-list').append(li_dom);
+        }
+    }
+};
+
+var room;
+var onConnected = function() {
+    var confOptions = {
+        openBridgeChannel: true,
+        confID: jitsi_domain + '/' + jitsi_room,
+    };
+    room = connection.initJitsiConference(jitsi_room, confOptions);
+    room.setDisplayName($('[name="bot-name"]').val());
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_FAILED,
+        function(error) {
+            alert("CONFERENCE_FAILED:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_ERROR,
+        function(error) {
+            alert("CONFERENCE_ERROR:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+        function(){
+            update_user_list();
+            room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
+                    update_user_list();
+            });
+        });
+
+    if ($('[name="password"]').val()) {
+        room.join($('[name="password"]').val());
+    } else {
+        room.join();
+    }
+}
+
+onLocalTracks = function(tracks) {
+    for (let i = 0; i < tracks.length; i++) {
+        room.addTrack(tracks[i]);
+    }
+};
+
+$('#share-desktop').click(function(e){
+    JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+    .then(onLocalTracks)
+    .catch(error => {
+    });
+});
+
+$(window).bind('beforeunload', unload);
+$(window).bind('unload', unload);
+function unload() {
+    if (room) {
+        room.leave();
+    }
+    if (connection) {
+		connection.disconnect();
+    }
+
+    for (var idx in windows) {
+        windows[idx].close();
+	}
+}
+
+</script>
+</body>
+</html>
