@@ -98,6 +98,21 @@ body {
 		Bot Name: <input type="text" name="bot-name" value="Jothon Helper"><br>
 		<button type="submit">Go</button>
 	</form>
+    <div id="logined-area" style="display:none">
+        <div>
+            畫面：
+            <select id="output-video" style="display:none"></select>
+            <button id="btn-access-video">同意使用攝影機</button>
+        </div>
+        <div>
+            聲音：
+            <select id="output-audio" style="display:none"></select>
+            <button id="btn-access-audio">同意使用麥克風</button>
+        </div>
+        Jitsi URL: <span id="jitsi-url"></span><br>
+		Password: <input type="password" name="password"><br>
+		Bot Name: <input type="text" name="bot-name" value=""><br>
+    </div>
   </div>
 </div>
 <div class="card" id="card-member">
@@ -536,6 +551,10 @@ const initOptions = {
 var jitsi_domain;
 var jitsi_room;
 var connection;
+var onDeviceListChanged = function(devices) {
+    update_devices();
+};
+
 $('#jitsi-form').submit(function(e){
         e.preventDefault();
         var matches = $('[name="url"]').val().match('^https://([^/]*)/(.*)$');
@@ -568,6 +587,10 @@ $('#jitsi-form').submit(function(e){
         connection = new JitsiMeetJS.JitsiConnection(null, null, options);
         connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
         connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('連線失敗'); });
+        JitsiMeetJS.mediaDevices.addEventListener(
+            JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
+        onDeviceListChanged);
+
     if ($('[name="password"]').val()) {
         connection.connect({
             password:$('[name="password"]').val(),
@@ -579,6 +602,23 @@ $('#jitsi-form').submit(function(e){
 
 $('#screen-choose-body-area').on('change', '.user-select', function(e){
     update_screen_video();
+});
+
+$('#btn-access-video').click(function(e){
+    e.preventDefault();
+    JitsiMeetJS.createLocalTracks({ devices: [ 'video' ] })
+    .then(update_devices)
+    .catch(error => {
+        throw error;
+    });
+});
+$('#btn-access-audio').click(function(e){
+    e.preventDefault();
+    JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ] })
+    .then(update_devices)
+    .catch(error => {
+        throw error;
+    });
 });
 
 var update_screen_video = function(){
@@ -664,13 +704,51 @@ var update_user_list = function(){
 };
 
 var room;
+var update_devices = function(tracks) {
+    console.log(tracks);
+    if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
+        JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
+            $('#output-video').html('');
+            $('#output-audio').html('');
+            $('#output-video').append($('<option></option>').attr('val', 'none').text('不使用'));
+            $('#output-audio').append($('<option></option>').attr('val', 'none').text('不使用'));
+            var has_video = false;
+            var has_audio = false;
+            for (var device of devices) {
+                if (device.kind == 'audioinput' && device.label != '') {
+                    $('#output-audio').append($('<option></option>').attr('val', device.deviceId).text(device.label));
+                    has_audio = true;
+                }
+                if (device.kind == 'videoinput' && device.label != '') {
+                    $('#output-video').append($('<option></option>').attr('val', device.deviceId).text(device.label));
+                    has_video = true;
+                }
+            }
+            if (has_audio) {
+                $('#output-audio').show();
+                $('#btn-access-audio').hide();
+            }
+            if (has_video) {
+                $('#output-video').show();
+                $('#btn-access-video').hide();
+            }
+        });
+    }
+};
+
 var onConnected = function() {
     var confOptions = {
         openBridgeChannel: true,
         confID: jitsi_domain + '/' + jitsi_room,
     };
+
+    $('#logined-area').show();
+    $('#jitsi-url').text('https://' + jitsi_domain + '/' + jitsi_room);
+    $('#logined-area [name="bot-name"]').val($('#jitsi-form [name="bot-name"]').val());
+    update_devices();
+
     room = connection.initJitsiConference(jitsi_room, confOptions);
-    room.setDisplayName($('[name="bot-name"]').val());
+    room.setDisplayName($('#jitsi-form [name="bot-name"]').val());
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_FAILED,
         function(error) {
