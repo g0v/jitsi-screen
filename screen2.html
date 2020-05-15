@@ -20,6 +20,11 @@ body {
 	width: 20%;
 	height: 50%;
 }
+
+#user-list .disable {
+    opacity: 20%;
+}
+
 #card-member{
 	position: absolute:
 	top: 50%;
@@ -119,7 +124,16 @@ body {
 	  成員
   </div>
   <div class="card-body">
-      <ul id="user-list"></ul>
+      <table class="table">
+          <thead>
+              <tr>
+                  <th>Name</th>
+                  <th>A/V</th>
+              </tr>
+          </thead>
+          <tbody id="user-list">
+          </tbody>
+      </table>
 	</p>
   </div>
 </div>
@@ -646,8 +660,6 @@ var update_screen_video = function(){
                     old_track.detach(video_dom[0]);
                 }
                 var track = room.getLocalVideoTrack();
-                console.log(old_track);
-                console.log(track);
                 if ('undefined' !== typeof(track)) {
                     video_dom.show();
                     track.attach(video_dom[0]);
@@ -690,9 +702,21 @@ var update_screen_video = function(){
 
 var update_user_list = function(){
     $('#user-list').html('');
-    var li_dom = $('<li></li>');
-    li_dom.html('me. ' + $('[name="bot-name"]').val() + ' @ ' + jitsi_room);
-    $('#user-list').append(li_dom);
+    var tr_dom = $('<tr></tr>');
+    tr_dom.append($('<td></td>').text('[me]' + $('[name="bot-name"]').val()));
+    var td_dom = $('<td></td>');
+    tr_dom.attr('id', 'user-list-me');
+    td_dom.append($('<i class="fas fa-microphone-alt"></i>'));
+    td_dom.append($('<i class="fas fa-video"></i>'));
+    tr_dom.append(td_dom);
+    if (!room || !room.getLocalAudioTrack()) {
+        $('.fa-microphone-alt', td_dom).addClass('disable');
+    }
+    if (!room || !room.getLocalVideoTrack()) {
+        $('.fa-video', td_dom).addClass('disable');
+    }
+
+    $('#user-list').append(tr_dom);
 
     $('.user-select').each(function(){
         var current_user = null;
@@ -732,9 +756,23 @@ var update_user_list = function(){
 
     if (room) {
         for (var id in room.participants) {
-            var li_dom = $('<li></li>');
-            li_dom.html(id + '. ' + room.participants[id].getDisplayName());
-            $('#user-list').append(li_dom);
+            var tr_dom = $('<tr></tr>');
+            tr_dom.attr('id', 'user-list-' + id);
+            tr_dom.append($('<td></td>').text(room.participants[id].getDisplayName()).attr('title', id));
+            var td_dom = $('<td></td>');
+            td_dom.append($('<i class="fas fa-microphone-alt"></i>'));
+            td_dom.append($('<i class="fas fa-video"></i>'));
+            tr_dom.append(td_dom);
+            audio_track = room.participants[id].getTracksByMediaType('audio')[0];
+            if (!audio_track || audio_track.muted) {
+                $('.fa-microphone-alt', td_dom).addClass('disable');
+            }
+
+            video_track = room.participants[id].getTracksByMediaType('video')[0];
+            if (!video_track || video_track.muted) {
+                $('.fa-video', td_dom).addClass('disable');
+            }
+            $('#user-list').append(tr_dom);
         }
     }
 };
@@ -749,11 +787,13 @@ $('#output-audio').change(function(){
         if (track.getType() != 'audio') continue;
         promises.push(room.removeTrack(track));
     }
+    $('#user-list-me .fa-microphone-alt').addClass('disable');
 
     Promise.all(promises).then(function(){
         if ('none' == id) {
         } else {
             get_local_audio_track(id, function(track){
+            $('#user-list-me .fa-microphone-alt').removeClass('disable');
                 room.addTrack(track);
             });
         }
@@ -769,6 +809,7 @@ $('#output-video').change(function(){
         if (track.videoType == 'desktop') {
             track.dispose();
         }
+        $('#user-list-me .fa-microphone-alt').addClass('disable');
     }
 
     Promise.all(promises).then(function(){
@@ -778,12 +819,14 @@ $('#output-video').change(function(){
             JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
             .then(function(tracks){
                 room.addTrack(tracks[0]).then(update_screen_video);
+                $('#user-list-me .fa-microphone-alt').removeClass('disable');
             })
             .catch(error => {
             });
         } else {
             get_local_video_track(id, function(track){
                 room.addTrack(track).then(update_screen_video);
+                $('#user-list-me .fa-microphone-alt').removeClass('disable');
             });
         }
     });
@@ -857,6 +900,12 @@ var onConnected = function() {
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, (track) => {
                     update_user_list();
             });
         });
