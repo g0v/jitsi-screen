@@ -767,6 +767,11 @@ var update_user_list = function(){
             if (!audio_track || audio_track.muted) {
                 $('.fa-microphone-alt', td_dom).addClass('disable');
             }
+            if (audio_track && !$(`#audio-${id}`).length) {
+                var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
+                $('#user-list').append(audio_dom);
+                audio_track.attach(audio_dom[0]);
+            }
 
             video_track = room.participants[id].getTracksByMediaType('video')[0];
             if (!video_track || video_track.muted) {
@@ -905,9 +910,13 @@ var onConnected = function() {
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                     update_user_list();
             });
+            room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
+                    update_user_list();
+            });
             room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, (track) => {
                     update_user_list();
             });
+            room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
         });
 
     if ($('[name="password"]').val()) {
@@ -916,6 +925,12 @@ var onConnected = function() {
         room.join();
     }
 }
+
+var level_changed = function(participant, audioLevel){
+    $(`#user-list-${participant} .fa-microphone-alt`).css({
+        'background-color': 'rgba(0, 255, 0, ' + audioLevel + ')',
+    });
+};
 
 var local_tracks = {};
 
