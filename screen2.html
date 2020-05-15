@@ -635,21 +635,36 @@ var update_screen_video = function(){
             }
             var video_dom = $('video', this);
             if (user_id == 'none') {
-                var old_track = video_dom.__track;
+                var old_track = video_dom[0].__track;
                 if (old_track) {
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.hide();
+            } else if (user_id == 'me') {
+                var old_track = video_dom[0].__track;
+                if (old_track) {
+                    old_track.detach(video_dom[0]);
+                }
+                var track = room.getLocalVideoTrack();
+                console.log(old_track);
+                console.log(track);
+                if ('undefined' !== typeof(track)) {
+                    video_dom.show();
+                    track.attach(video_dom[0]);
+                    video_dom[0].__track = track;
+                    video_dom[0].play();
+                }
+                
             } else if (user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
-                    var old_track = video_dom.__track;
+                    var old_track = video_dom[0].__track;
                     if (old_track) {
                         old_track.detach(video_dom[0]);
                     }
                     video_dom.show();
                     track.attach(video_dom[0]);
-                    video_dom.__track = track;
+                    video_dom[0].__track = track;
                     video_dom[0].play();
                 });
             } else {
@@ -658,14 +673,14 @@ var update_screen_video = function(){
                 }
 
                 var tracks = room.participants[user_id].getTracksByMediaType('video');
-                var old_track = video_dom.__track;
+                var old_track = video_dom[0].__track;
                 if (old_track) {
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.show();
                 if (tracks.length) {
                     tracks[0].attach(video_dom[0]);
-                    video_dom.__track = tracks[0];
+                    video_dom[0].__track = tracks[0];
                     video_dom[0].play();
                 }
             }
@@ -690,6 +705,10 @@ var update_user_list = function(){
         $(this).html('');
         option_dom = $('<option></option>');
         option_dom.html('不顯示').val('none');
+        $(this).append(option_dom);
+
+        option_dom = $('<option></option>');
+        option_dom.html('自己').val('me');
         $(this).append(option_dom);
 
         for (var device of device_list.video) {
@@ -723,6 +742,53 @@ var update_user_list = function(){
 var room;
 var device_list = {audio: [], video: []};
 
+$('#output-audio').change(function(){
+    var id = $(this).val();
+    var promises = [];
+    for (var track of room.getLocalTracks()) {
+        if (track.getType() != 'audio') continue;
+        promises.push(room.removeTrack(track));
+    }
+
+    Promise.all(promises).then(function(){
+        if ('none' == id) {
+        } else {
+            get_local_audio_track(id, function(track){
+                room.addTrack(track);
+            });
+        }
+    });
+});
+
+$('#output-video').change(function(){
+    var id = $(this).val();
+    var promises = [];
+    for (var track of room.getLocalTracks()) {
+        if (track.getType() != 'video') continue;
+        promises.push(room.removeTrack(track));
+        if (track.videoType == 'desktop') {
+            track.dispose();
+        }
+    }
+
+    Promise.all(promises).then(function(){
+        if ('none' == id) {
+            update_screen_video();
+        } else if ('screenshare' == id) {
+            JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+            .then(function(tracks){
+                room.addTrack(tracks[0]).then(update_screen_video);
+            })
+            .catch(error => {
+            });
+        } else {
+            get_local_video_track(id, function(track){
+                room.addTrack(track).then(update_screen_video);
+            });
+        }
+    });
+});
+
 var update_devices = function(tracks) {
     if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
         JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
@@ -730,8 +796,9 @@ var update_devices = function(tracks) {
             $('#output-audio').html('');
             device_list.audio = [];
             device_list.video = [];
-            $('#output-video').append($('<option></option>').attr('val', 'none').text('不使用'));
-            $('#output-audio').append($('<option></option>').attr('val', 'none').text('不使用'));
+            $('#output-video').append($('<option></option>').attr('value', 'none').text('不使用'));
+            $('#output-video').append($('<option></option>').attr('value', 'screenshare').text('螢幕分享'));
+            $('#output-audio').append($('<option></option>').attr('value', 'none').text('不使用'));
             var has_video = false;
             var has_audio = false;
             for (var device of devices) {
@@ -801,9 +868,16 @@ var onConnected = function() {
     }
 }
 
+var local_tracks = {};
+
 function get_local_video_track(device_id, callback) {
+    if (local_tracks[device_id]) {
+        callback(local_tracks[device_id]);
+        return;
+    }
     JitsiMeetJS.createLocalTracks({ devices: [ 'video' ], cameraDeviceId: device_id })
     .then(function(tracks){
+        local_tracks[device_id] = tracks[0];
         callback(tracks[0]);
     })
     .catch(error => {
@@ -811,18 +885,21 @@ function get_local_video_track(device_id, callback) {
     });
 };
 
-onLocalTracks = function(tracks) {
-    for (let i = 0; i < tracks.length; i++) {
-        room.addTrack(tracks[i]);
+function get_local_audio_track(device_id, callback) {
+    if (local_tracks[device_id]) {
+        callback(local_tracks[device_id]);
+        return;
     }
+    JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ], cameraDeviceId: device_id })
+    .then(function(tracks){
+        local_tracks[device_id] = tracks[0];
+        callback(tracks[0]);
+    })
+    .catch(error => {
+        throw error;
+    });
 };
 
-$('#share-desktop').click(function(e){
-    JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
-    .then(onLocalTracks)
-    .catch(error => {
-    });
-});
 
 $(window).bind('beforeunload', unload);
 $(window).bind('unload', unload);
