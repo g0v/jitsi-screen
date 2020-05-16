@@ -220,22 +220,22 @@ body {
 </div>
 <script>
 var default_data = {
-	scenes: {
-		"1": {
-			"name": "單人全螢幕",
-			"content": "<div class=\"video-box\" data-id=\"1\"></div>",
-		},
-        "2" : {
-            "name": "四分割螢幕",
-            "content": "<style>.video-box { width:50%; height:50%; float:left;  } </style>"+
-                "<div class=\"video-box\" data-id=\"1\"></div>"+
-                "<div class=\"video-box\" data-id=\"2\"></div>"+
-                "<div class=\"video-box\" data-id=\"3\"></div>"+
-                "<div class=\"video-box\" data-id=\"4\"></div>"
-        }
-	},
+    scenes: {},
 	screens: [],
 };
+var loading_scenes = [1,2];
+var loading_promises = [];
+for (var id of loading_scenes) {
+    loading_promises.push($.get('scenes/' + id + '.html').then(function(text){
+        id = text.split("\n")[0];
+        name = text.split("\n")[1];
+        content = text.split("\n").slice(2).join("\n");
+        default_data.scenes[id] = {
+            name: name,
+            content: content,
+        };
+    }));
+}
 var current_data = null;
 var windows = {};
 
@@ -253,7 +253,9 @@ var load_data = function(data){
 };
 
 $(function(){
-    load_data(default_data);
+    Promise.all(loading_promises).then(function(){
+        load_data(default_data);
+    });
 });
 
 $('#screen-chooser').change(function(){
