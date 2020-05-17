@@ -212,6 +212,8 @@ body {
           <input type="text" name="width" value="1600" size="5"> x 
           <input type="text" name="height" value="900" size="5"> 
           <button class="btn btn-primary btn-sm" type="submit">更新預覽尺寸</button>
+      線上人數:
+      <input type="number" name="preview-user" value="4">
       </form>
   </div>
   <div class="card-body">
@@ -223,7 +225,7 @@ var default_data = {
     scenes: {},
 	screens: [],
 };
-var loading_scenes = [1,2];
+var loading_scenes = [1,2,3];
 var loading_promises = [];
 for (var id of loading_scenes) {
     loading_promises.push($.get('scenes/' + id + '.html').then(function(text){
@@ -283,12 +285,78 @@ var update_screen_choose = function(){
     update_user_list();
 };
 
-var update_preview_content = function(content){
-    $($('#preview-iframe')[0].contentDocument.body).html(content);
-    var seq = 0;
-    $('.video-box', $('#preview-iframe')[0].contentDocument.body).each(function(){
-        var id = $(this).data('id');
+var init_win_env = function(win, preview){
+    win.Jitsi = {};
+    win.Jitsi._callbacks = {};
+    win.Jitsi.fire = function(event, data){
+        if ('undefined' === typeof(win.Jitsi._callbacks[event])) {
+            return;
+        }
+        for (var callback of win.Jitsi._callbacks[event]) {
+            callback(data);
+        }
+    };
+    win.Jitsi.on = function(event, callback){
+        if ('undefined' === typeof(win.Jitsi._callbacks[event])) {
+            win.Jitsi._callbacks[event] = [];
+        }
+        win.Jitsi._callbacks[event].push(callback);
+    };
+    win.Jitsi.getUsers = function(){
+        if (preview) {
+            return preview_fake_users.map(function(id){
+                return {id: id, name: 'User-' + id};
+            });
+        } else {
+            if (!room) {
+                return [];
+            }
+            users = [];
+            users.push({id: 'me', name: $('[name="bot-name"]').val()});
+            for (var id in room.participants) {
+                users.push({id: id, name: room.participants[id].getDisplayName()});
+            }
+            return users;
+        }
+        return [];
+    };
+    win.Jitsi.reload = function(){
+        if (preview) {
+            update_preview_video();
+        } else {
+            update_screen_video();
+        }
+    };
+};
 
+$('#resize-form [name="preview-user"]').change(function(){
+    var win = $('#preview-iframe')[0].contentWindow;
+    var v = parseInt($(this).val());
+    if (v > preview_fake_users.length) {
+        preview_fake_counter ++;
+        preview_fake_users.push(preview_fake_counter);
+        win.Jitsi.fire('user_joined', {id: preview_fake_counter, name: 'User-' + preview_fake_counter});
+    } else {
+        for (i = preview_fake_users.length; i > v; i --) {
+            var idx = Math.floor(Math.random() * preview_fake_users.length);
+            var deleted_user = preview_fake_users[idx];
+            preview_fake_users = preview_fake_users.slice(0, idx).concat(preview_fake_users.slice(idx + 1));
+            win.Jitsi.fire('user_left', {id: deleted_user, name: 'User-' + deleted_user});
+        }
+    }
+});
+
+var preview_fake_counter = 0;
+var preview_fake_users = [];
+
+var update_preview_video = function(){
+    $('.video-box', $('#preview-iframe')[0].contentDocument).each(function(){
+        var id = $(this).attr('data-id');
+        if ('undefined' === typeof(id)) {
+            id = 'U' + $(this).attr('data-user');
+        }
+
+        $(this).html('');
         // draw fake video
         var canvas = document.createElement('canvas');
         canvas.width = 800;
@@ -347,8 +415,19 @@ var update_preview_content = function(content){
         });
 
         $(this).append(canvas_dom);
-
     });
+};
+
+var update_preview_content = function(content){
+    var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
+    for (var i = 0; i < preview_fake_user; i ++) {
+        preview_fake_counter ++;
+        preview_fake_users.push(preview_fake_counter);
+    }
+    init_win_env($('#preview-iframe')[0].contentWindow, true);
+    $('#preview-iframe')[0].contentDocument.open();
+    $('#preview-iframe')[0].contentDocument.write(content);
+    update_preview_video();
 };
 
 var update_screen_data = function(){
@@ -445,7 +524,10 @@ $('#form-screen-choose').submit(function(e){
         $('#screen-choose-body-' + idx + ' .btn-focus').hide();
     };
     check_resize(win, width, height);
-    $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
+    init_win_env(win);
+    win.document.open();
+    win.document.write(current_data.scenes[scene_id].content);
+    $(win.document.body).css('margin', 0);
     $('.video-box', win.document).ready(function(){
         update_screen_video();
     });
@@ -475,6 +557,7 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     $('#screen-choose-body-' + idx + ' .btn-reopen').hide();
     $('#screen-choose-body-' + idx + ' .btn-focus').show();
     check_resize(win, width, height);
+    init_win_env(win);
     $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
     current_data.scenes[scene_id].win = win;
     windows[idx] = win;
@@ -645,7 +728,10 @@ var update_screen_video = function(){
         win = windows[idx];
         $('.video-box', win.document).each(function(){
             var data_id = $(this).data('id');
-            user_id = user_select[$(this).data('id')];
+            user_id = user_select[$(this).attr('data-id')];
+            if ('undefined' === typeof(user_id)) {
+                user_id = $(this).attr('data-user');
+            }
             if (!$('video', this).length) {
                 $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
             }
@@ -668,8 +754,7 @@ var update_screen_video = function(){
                     video_dom[0].__track = track;
                     video_dom[0].play();
                 }
-                
-            } else if (user_id.match(/^camera-/)) {
+            } else if (user_id.match && user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
                     var old_track = video_dom[0].__track;
@@ -904,9 +989,15 @@ var onConnected = function() {
         function(){
             update_user_list();
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('user_joined', {id: id, name: user.getDisplayName()});
+                    }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('user_left', {id: id, name: user.getDisplayName()});
+                    }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
