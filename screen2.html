@@ -963,7 +963,7 @@ var update_devices = function(tracks) {
 
 var onConnected = function() {
     var confOptions = {
-        openBridgeChannel: true,
+        openBridgeChannel: 'websocket',
         confID: jitsi_domain + '/' + jitsi_room,
     };
 
