@@ -967,6 +967,9 @@ var onConnected = function() {
     var confOptions = {
         openBridgeChannel: 'websocket',
         confID: jitsi_domain + '/' + jitsi_room,
+        capScreenshareBitrate: true,
+        disableRtx: false,
+        enableLayerSuspension: false,
     };
 
     $('#logined-area').show();
