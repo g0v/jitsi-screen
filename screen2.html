@@ -304,17 +304,24 @@ var init_win_env = function(win, preview){
     };
     win.Jitsi.getUsers = function(){
         if (preview) {
+            var first = true;
             return preview_fake_users.map(function(id){
-                return {id: id, name: 'User-' + id};
+                if (first) {
+                    var me = true;
+                    first = false;
+                } else {
+                    var me = false;
+                }
+                return {id: id, name: 'User-' + id, me: me};
             });
         } else {
             if (!room) {
                 return [];
             }
             users = [];
-            users.push({id: 'me', name: $('[name="bot-name"]').val()});
+            users.push({id: room.myUserId(), name: $('[name="bot-name"]').val(), me: true});
             for (var id in room.participants) {
-                users.push({id: id, name: room.participants[id].getDisplayName()});
+                users.push({id: id, name: room.participants[id].getDisplayName(), me: false});
             }
             return users;
         }
@@ -742,18 +749,6 @@ var update_screen_video = function(){
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.hide();
-            } else if (user_id == 'me') {
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    old_track.detach(video_dom[0]);
-                }
-                var track = room.getLocalVideoTrack();
-                if ('undefined' !== typeof(track)) {
-                    video_dom.show();
-                    track.attach(video_dom[0]);
-                    video_dom[0].__track = track;
-                    video_dom[0].play();
-                }
             } else if (user_id.match && user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
@@ -767,11 +762,18 @@ var update_screen_video = function(){
                     video_dom[0].play();
                 });
             } else {
-                if ('undefined' === typeof(room.participants[user_id])) {
+                if (user_id == room.myUserId()) {
+                    var track = room.getLocalVideoTrack();
+                    var tracks = [];
+                    if ('undefined' !== typeof(track)) {
+                        tracks.push(track);
+                    }
+                } else if ('undefined' !== typeof(room.participants[user_id])) {
+                    var tracks = room.participants[user_id].getTracksByMediaType('video');
+                } else {
                     return;
                 }
 
-                var tracks = room.participants[user_id].getTracksByMediaType('video');
                 var old_track = video_dom[0].__track;
                 if (old_track) {
                     old_track.detach(video_dom[0]);
@@ -818,9 +820,6 @@ var update_user_list = function(){
         option_dom.html('不顯示').val('none');
         $(this).append(option_dom);
 
-        option_dom = $('<option></option>');
-        option_dom.html('自己').val('me');
-        $(this).append(option_dom);
 
         for (var device of device_list.video) {
             var option_dom = $('<option></option>');
@@ -829,6 +828,9 @@ var update_user_list = function(){
         }
 
         if (room) {
+            option_dom = $('<option></option>');
+            option_dom.html('自己').val(room.myUserId());
+            $(this).append(option_dom);
             for (var id in room.participants) {
                 var option_dom = $('<option></option>');
                 option_dom.html(id + '. ' + room.participants[id].getDisplayName()).val(id);
