@@ -801,14 +801,19 @@ var update_user_list = function(){
     tr_dom.append($('<td></td>').text('[me]' + $('[name="bot-name"]').val()));
     var td_dom = $('<td></td>');
     tr_dom.attr('id', 'user-list-me');
-    td_dom.append($('<i class="fas fa-microphone-alt"></i>'));
-    td_dom.append($('<i class="fas fa-video"></i>'));
+    td_dom.append($('<i class="fas microphone-stat"></i>'));
+    td_dom.append($('<i class="fas video-stat fa-video"></i>'));
     tr_dom.append(td_dom);
+
     if (!room || !room.getLocalAudioTrack()) {
-        $('.fa-microphone-alt', td_dom).addClass('disable');
+        $('.microphone-stat', td_dom).addClass('fa-microphone-alt-slash');
+    } else {
+        $('.microphone-stat', td_dom).addClass('fa-microphone-alt');
     }
     if (!room || !room.getLocalVideoTrack()) {
-        $('.fa-video', td_dom).addClass('disable');
+        $('.video-stat', td_dom).addClass('fa-video-slash');
+    } else {
+        $('.video-stat', td_dom).addClass('fa-video');
     }
 
     $('#user-list').append(tr_dom);
@@ -855,12 +860,14 @@ var update_user_list = function(){
             tr_dom.attr('id', 'user-list-' + id);
             tr_dom.append($('<td></td>').text(room.participants[id].getDisplayName()).attr('title', id));
             var td_dom = $('<td></td>');
-            td_dom.append($('<i class="fas fa-microphone-alt"></i>'));
-            td_dom.append($('<i class="fas fa-video"></i>'));
+            td_dom.append($('<i class="fas microphone-stat"></i>'));
+            td_dom.append($('<i class="fas video-stat fa-video"></i>'));
             tr_dom.append(td_dom);
             audio_track = room.participants[id].getTracksByMediaType('audio')[0];
             if (!audio_track || audio_track.muted) {
-                $('.fa-microphone-alt', td_dom).addClass('disable');
+                $('.microphone-stat', td_dom).addClass('fa-microphone-alt-slash');
+            } else {
+                $('.microphone-stat', td_dom).addClass('fa-microphone-alt');
             }
             if (audio_track && !$(`#audio-${id}`).length) {
                 var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
@@ -870,7 +877,9 @@ var update_user_list = function(){
 
             video_track = room.participants[id].getTracksByMediaType('video')[0];
             if (!video_track || video_track.muted) {
-                $('.fa-video', td_dom).addClass('disable');
+                $('.video-stat', td_dom).addClass('fa-video-slash');
+            } else {
+                $('.video-stat', td_dom).addClass('fa-video');
             }
             $('#user-list').append(tr_dom);
         }
