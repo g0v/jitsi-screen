@@ -39,6 +39,21 @@ body {
 	width: 40%;
 	height: 50%;
 }
+
+.user-list-name {
+    position: absolute;
+    z-index: 20;
+}
+
+.audiolevel-area {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(128, 255, 128);
+}
+
 #card-screen-choose {
 	position: absolute;
 	top: 50%;
@@ -798,7 +813,7 @@ var update_screen_video = function(){
 var update_user_list = function(){
     $('#user-list').html('');
     var tr_dom = $('<tr></tr>');
-    tr_dom.append($('<td></td>').text('[me]' + $('[name="bot-name"]').val()));
+    tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text('[me]' + $('[name="bot-name"]').val())).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
     var td_dom = $('<td></td>');
     tr_dom.attr('id', 'user-list-me');
     td_dom.append($('<i class="fas microphone-stat"></i>'));
@@ -858,7 +873,7 @@ var update_user_list = function(){
         for (var id in room.participants) {
             var tr_dom = $('<tr></tr>');
             tr_dom.attr('id', 'user-list-' + id);
-            tr_dom.append($('<td></td>').text(room.participants[id].getDisplayName()).attr('title', id));
+            tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text(room.participants[id].getDisplayName())).attr('title', id).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
             var td_dom = $('<td></td>');
             td_dom.append($('<i class="fas microphone-stat"></i>'));
             td_dom.append($('<i class="fas video-stat fa-video"></i>'));
@@ -1040,8 +1055,9 @@ var onConnected = function() {
 }
 
 var level_changed = function(participant, audioLevel){
-    $(`#user-list-${participant} .fa-microphone-alt`).css({
-        'background-color': 'rgba(0, 255, 0, ' + audioLevel + ')',
+    var width = $(`#user-list-${participant} .audiolevel-area`).parent().outerWidth();
+    $(`#user-list-${participant} .audiolevel-area`).css({
+        right: Math.floor((1 - audioLevel) * width),
     });
 };
 
@@ -1070,6 +1086,9 @@ function get_local_audio_track(device_id, callback) {
     JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ], cameraDeviceId: device_id })
     .then(function(tracks){
         local_tracks[device_id] = tracks[0];
+        tracks[0].addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, function(audioLevel) {
+            level_changed('me', audioLevel);
+        });
         callback(tracks[0]);
     })
     .catch(error => {
