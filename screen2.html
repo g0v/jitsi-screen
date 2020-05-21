@@ -191,7 +191,7 @@ body {
   <div class="card-header">
 	  場景編輯
 	  <button class="btn btn-primary btn-sm" type="button" id="btn-scene-editor-preview">更新預覽</button>
-	  <button class="btn btn-primary btn-sm" type="button">儲存</button>
+	  <button class="btn btn-primary btn-sm" type="button" id="btn-scene-editor-save">儲存</button>
   </div>
   <div class="card-body">
 		<form id="form-scene-editor">
@@ -590,6 +590,7 @@ $('#screen-list').on('click', '.screen-item', function(e){
 $('#scene-list').on('click', '.btn-preview', function(e){
 	e.preventDefault();
     var scene = current_data.scenes[$(this).parents('li').data('id')];
+    $('#form-scene-editor').data('scene_id', $(this).parents('li').data('id'));
     $('#form-scene-editor [name="name"]').val(scene.name);
     $('#form-scene-editor [name="content"]').val(scene.content);
     update_preview_content(scene.content);
@@ -598,6 +599,11 @@ $('#scene-list').on('click', '.btn-preview', function(e){
 $('#btn-scene-editor-preview').click(function(e){
     var content = $('#form-scene-editor [name="content"]').val();
     update_preview_content(content);
+});
+
+$('#btn-scene-editor-save').click(function(e){
+    var content = $('#form-scene-editor [name="content"]').val();
+    current_data.scenes[$('#form-scene-editor').data('scene_id')].content = content;
 });
 
 var update_preview_size = function(){
