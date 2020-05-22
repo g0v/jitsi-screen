@@ -149,7 +149,7 @@ body {
           <tbody id="user-list">
           </tbody>
       </table>
-	</p>
+      <div id="audio-pool"></div>
   </div>
 </div>
 <div class="card" id="card-scene-choose">
@@ -1026,8 +1026,23 @@ var onConnected = function() {
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_JOINED,
         function(){
+            for (var id in room.participants) {
+                if (!$(`#audio-${id}`).length) {
+                    var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
+                    $('#audio-pool').append(audio_dom);
+                }
+
+                audio_track = room.participants[id].getTracksByMediaType('audio')[0];
+                if (audio_track) {
+                    audio_track.attach(audio_dom[0]);
+                }
+            }
             update_user_list();
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
+                    if (!$(`#audio-${id}`).length) {
+                        var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
+                        $('#audio-pool').append(audio_dom);
+                    }
                     for (var idx in windows) {
                         windows[idx].Jitsi.fire('user_joined', {id: id, name: user.getDisplayName()});
                     }
@@ -1040,9 +1055,15 @@ var onConnected = function() {
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
+                    if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
+                        track.attach($('#audio-' + track.ownerEndpointId)[0]);
+                    }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
+                    if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
+                        track.detach($('#audio-' + track.ownerEndpointId)[0]);
+                    }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, (track) => {
