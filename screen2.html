@@ -802,6 +802,10 @@ var update_screen_video = function(){
                 video_dom.show();
                 if (tracks.length) {
                     tracks[0].attach(video_dom[0]);
+                    if ($(this).data('select') == 'true') {
+                        room.selectParticipant(user_id);
+                    }
+
                     video_dom[0].__track = tracks[0];
                     video_dom[0].play();
                 }
