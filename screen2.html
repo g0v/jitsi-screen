@@ -893,6 +893,10 @@ var update_user_list = function(){
                 $('#user-list').append(audio_dom);
                 audio_track.attach(audio_dom[0]);
             }
+            var audio_dom = $(`#audio-${id}`)[0];
+            if (audio_dom && audio_dom.muted) {
+                $('.microphone-stat', td_dom).addClass('disable');
+            }
 
             video_track = room.participants[id].getTracksByMediaType('video')[0];
             if (!video_track || video_track.muted) {
@@ -1121,6 +1125,20 @@ function get_local_audio_track(device_id, callback) {
     });
 };
 
+$('#user-list').on('click', '.microphone-stat', function(e){
+    e.preventDefault();
+    var id = $(this).parents('tr').attr('id').split('-')[2];
+    if (id == 'me') return;
+    var audio_dom = $('#audio-' + id)[0];
+    if (!audio_dom) return;
+    if (audio_dom.muted) {
+        audio_dom.muted = false;
+    } else {
+        audio_dom.muted = true;
+    }
+    update_user_list();
+
+});
 
 $(window).bind('beforeunload', unload);
 $(window).bind('unload', unload);
