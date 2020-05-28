@@ -9,6 +9,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script src="//meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
+<script src="common.js"></script>
 <style>
 body {
     overflow: hidden;
@@ -298,57 +299,6 @@ var update_screen_choose = function(){
 	}
     $('#screen-chooser').change();
     update_user_list();
-};
-
-var init_win_env = function(win, preview){
-    win.Jitsi = {};
-    win.Jitsi._callbacks = {};
-    win.Jitsi.fire = function(event, data){
-        if ('undefined' === typeof(win.Jitsi._callbacks[event])) {
-            return;
-        }
-        for (var callback of win.Jitsi._callbacks[event]) {
-            callback(data);
-        }
-    };
-    win.Jitsi.on = function(event, callback){
-        if ('undefined' === typeof(win.Jitsi._callbacks[event])) {
-            win.Jitsi._callbacks[event] = [];
-        }
-        win.Jitsi._callbacks[event].push(callback);
-    };
-    win.Jitsi.getUsers = function(){
-        if (preview) {
-            var first = true;
-            return preview_fake_users.map(function(id){
-                if (first) {
-                    var me = true;
-                    first = false;
-                } else {
-                    var me = false;
-                }
-                return {id: id, name: 'User-' + id, me: me};
-            });
-        } else {
-            if (!room) {
-                return [];
-            }
-            users = [];
-            users.push({id: room.myUserId(), name: $('[name="bot-name"]').val(), me: true});
-            for (var id in room.participants) {
-                users.push({id: id, name: room.participants[id].getDisplayName(), me: false});
-            }
-            return users;
-        }
-        return [];
-    };
-    win.Jitsi.reload = function(){
-        if (preview) {
-            update_preview_video();
-        } else {
-            update_screen_video();
-        }
-    };
 };
 
 $('#resize-form [name="preview-user"]').change(function(){
