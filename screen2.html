@@ -494,7 +494,11 @@ $('#form-screen-choose').submit(function(e){
     init_win_env(win);
     win.document.open();
     win.document.write(current_data.scenes[scene_id].content);
-    win.document.title = '畫面 ' + idx;
+    if (title) {
+        win.document.title = '畫面 ' + title;
+    } else {
+        win.document.title = '畫面 ' + idx;
+    }
     win.onunload = function(){
         $('#screen-choose-body-' + idx + ' .btn-reopen').show();
         $('#screen-choose-body-' + idx + ' .btn-focus').hide();
@@ -521,7 +525,11 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     height = current_data.screens[idx].height;
     scene_id = current_data.screens[idx].scene_id;
     var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
-    win.document.title = '畫面 ' + idx;
+    if (current_data.screens[idx].title) {
+        win.document.title = '畫面 ' + current_data.screens[idx].title;
+    } else {
+        win.document.title = '畫面 ' + idx;
+    }
     win.onunload = function(){
         $('#screen-choose-body-' + idx + ' .btn-reopen').show();
         $('#screen-choose-body-' + idx + ' .btn-focus').hide();
