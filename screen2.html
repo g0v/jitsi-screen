@@ -518,6 +518,17 @@ $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
     windows[idx].focus();
 });
 
+$('#screen-choose-body-area').on('change', '[name="title"]', function(e){
+    e.preventDefault();
+    var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
+    var title = $(this).val();
+    if (title) {
+        windows[idx].document.title = '畫面 ' + title;
+    } else {
+        windows[idx].document.title = '畫面 ' + idx;
+    }
+});
+
 $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
