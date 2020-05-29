@@ -281,6 +281,12 @@ $('#screen-chooser').change(function(){
     var user_list = get_list_from_content(current_data.scenes[scene_id].content);
     var div_dom = $('#form-screen-choose');
     $('.custom-box', div_dom).html('');
+    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span>');
+    var viewer_dom = $('<select></select>').addClass('viewer-select');
+    viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
+    $('.custom-box', div_dom).append(viewer_dom);
+    $('.custom-box', div_dom).append($('<button class="btn-add-viewer">+</button>'));
+    $('.custom-box', div_dom).append('<br>');
     user_list.map(function(id){
         $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
         $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('name', 'user-select[' + id + ']'));
@@ -459,6 +465,7 @@ $('#form-screen-choose').submit(function(e){
         title: title,
         width: width,
         height: height,
+        viewers: $('#form-screen-choose .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray()
     });
     var div_dom = $($('#tmpl-screen-choose-body').html());
     $('h3', div_dom).text('畫面 ' + idx + ' ' + title);
@@ -467,12 +474,21 @@ $('#form-screen-choose').submit(function(e){
     $('[name="width"]', div_dom).val(width);
     $('[name="height"]', div_dom).val(height);
     var user_list = get_list_from_content(current_data.scenes[scene_id].content);
+    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span>');
+    current_data.screens[idx].viewers.map(function(viewer){
+            $('.viewer-list', div_dom).append($('<button></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+    });
+    var viewer_dom = $('<select></select>').addClass('viewer-select');
+    viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
+    $('.custom-box', div_dom).append(viewer_dom);
+    $('.custom-box', div_dom).append($('<button class="btn-add-viewer">+</button>'));
+    $('.custom-box', div_dom).append('<br>');
     user_list.map(function(id){
         $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
         $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).addClass('user-select-' + id));
         $('.custom-box', div_dom).append('<br>');
     });
-    div_dom.attr('id', 'screen-choose-body-' + idx);
+    div_dom.attr('id', 'screen-choose-body-' + idx).data('screen_id', idx);
 
     $('#screen-choose-body-area').append(div_dom);
     update_user_list();
@@ -692,6 +708,38 @@ $('#jitsi-form').submit(function(e){
         });
     } else {
         connection.connect();
+    }
+});
+
+$('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
+    e.preventDefault();
+    var box_dom = $(this).parents('.custom-box');
+    var viewer = $('.viewer-select', box_dom).val();
+    $('.viewer-list', box_dom).append($('<button></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+    var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
+    if ('undefined' === typeof(screen_id)) {
+        return;
+    }
+    current_data.screens[screen_id].viewers = $('.btn-delete-viewer', box_dom).map(function(a){ return $(this).data('viewer'); }).toArray()
+    if (room) {
+        room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
+    }
+    // TODO: skip if viewer has been added
+    // TODO: delete other same viewer from different view
+});
+
+$('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
+    e.preventDefault();
+    var box_dom = $(this).parents('.custom-box');
+    var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
+    var deleting_viewer = $(this).data('viewer');
+    $(this).remove();
+    if ('undefined' === typeof(screen_id)) {
+        return;
+    }
+    current_data.screens[screen_id].viewers = $('.btn-delete-viewer', box_dom).map(function(a){ return $(this).data('viewer'); }).toArray()
+    if (room) {
+        room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
     }
 });
 
