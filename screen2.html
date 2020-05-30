@@ -755,6 +755,9 @@ $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
 $('#screen-choose-body-area').on('change', '.user-select', function(e){
     var screen_choose_body_dom = $(this).parents('.screen-choose-body');
     var screen_id = screen_choose_body_dom.data('screen_id');
+    if ('undefined' === typeof(screen_id)) {
+        return;
+    }
 
     $('.user-select', screen_choose_body_dom).each(function(){
         current_data.screens[screen_id].user_select[$(this).data('id')] = $(this).val();
