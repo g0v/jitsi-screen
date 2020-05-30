@@ -148,6 +148,9 @@ var update_screen_video = function(){
         if ('undefined' === typeof(user_id)) {
             user_id = $(this).attr('data-user');
         }
+        if ('undefined' === typeof(user_id)) {
+            return;
+        }
         if (!$('video', this).length) {
             $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
         }
