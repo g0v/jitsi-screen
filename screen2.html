@@ -913,7 +913,7 @@ var update_user_list = function(){
 
         if (room) {
             option_dom = $('<option></option>');
-            option_dom.html('自己').val(room.myUserId());
+            option_dom.html(room.myUserId() + '. Me').val(room.myUserId());
             $(this).append(option_dom);
             for (var id in room.participants) {
                 var option_dom = $('<option></option>');
