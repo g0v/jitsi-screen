@@ -724,6 +724,12 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     e.preventDefault();
     var box_dom = $(this).parents('.custom-box');
     var viewer = $('.viewer-select', box_dom).val();
+    for (var i = 0; i < $('.btn-delete-viewer', box_dom).length; i ++) {
+        if ($('.btn-delete-viewer', box_dom).eq(i).data('viewer') == viewer) {
+            // viewer has been added, skip
+            return;
+        }
+    }
     $('.viewer-list', box_dom).append($('<button></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
     var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
     if ('undefined' === typeof(screen_id)) {
@@ -733,7 +739,6 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     if (room) {
         room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
     }
-    // TODO: skip if viewer has been added
     // TODO: delete other same viewer from different view
 });
 
