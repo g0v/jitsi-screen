@@ -465,7 +465,8 @@ $('#form-screen-choose').submit(function(e){
         title: title,
         width: width,
         height: height,
-        viewers: $('#form-screen-choose .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray()
+        viewers: $('#form-screen-choose .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray(),
+        user_select: user_select,
     });
     var div_dom = $($('#tmpl-screen-choose-body').html());
     $('h3', div_dom).text('畫面 ' + idx + ' ' + title);
@@ -744,6 +745,13 @@ $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
 });
 
 $('#screen-choose-body-area').on('change', '.user-select', function(e){
+    var screen_choose_body_dom = $(this).parents('.screen-choose-body');
+    var screen_id = screen_choose_body_dom.data('screen_id');
+
+    $('.user-select', screen_choose_body_dom).each(function(){
+        current_data.screens[screen_id].user_select[$(this).data('id')] = $(this).val();
+    });
+    room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
     update_screen_video();
 });
 
@@ -766,10 +774,7 @@ $('#btn-access-audio').click(function(e){
 
 var update_screen_video = function(){
     for (var idx in windows) {
-        var user_select = {};
-        $('#screen-choose-body-' + idx + ' .user-select').each(function(){
-            user_select[$(this).data('id')] = $(this).val();
-        });
+        var user_select = current_data.screens[idx].user_select;
         win = windows[idx];
         $('.video-box', win.document).each(function(){
             var data_id = $(this).data('id');
