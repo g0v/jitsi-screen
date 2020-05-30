@@ -1068,6 +1068,15 @@ var onConnected = function() {
                 }
             }
             update_user_list();
+
+            room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
+                    if (message.type == 'request_scene') {
+                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: {
+                                current_data: current_data
+                        }});
+                    }
+            });
+
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
