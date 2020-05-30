@@ -735,11 +735,23 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     if ('undefined' === typeof(screen_id)) {
         return;
     }
+    for (var checking_screen_id in current_data.screens) {
+        if (checking_screen_id == screen_id) {
+            continue;
+        }
+        if (current_data.screens[checking_screen_id].viewers.indexOf(viewer) >= 0) {
+            $('#screen-choose-body-' + checking_screen_id + ' .btn-delete-viewer').each(function(){
+                if ($(this).data('viewer') == viewer) {
+                    $(this).remove();
+                }
+            });
+            current_data.screens[checking_screen_id].viewers = $('#screen-choose-body-' + checking_screen_id + ' .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray()
+        }
+    }
     current_data.screens[screen_id].viewers = $('.btn-delete-viewer', box_dom).map(function(a){ return $(this).data('viewer'); }).toArray()
     if (room) {
         room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
     }
-    // TODO: delete other same viewer from different view
 });
 
 $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
