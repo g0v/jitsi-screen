@@ -1,0 +1,167 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>分割畫面小幫手 Jitsi Screen :: 線上揪松 Jothon Online</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="//meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
+</head>
+<body>
+<form method="post" id="jitsi-form">
+    Jitsi URL: <input size="100" type="text" name="url" value="https://meet.jit.si/jitsiscreentest"><br>
+    Password: <input type="password" name="password"><br>
+    Bot Name: <input type="text" name="bot-name" value="Jothon Helper"><br>
+    <button type="submit">Go</button>
+</form>
+<img src="#" id="image" style="display: none">
+<button type="button" id="share-desktop" style="display: none">Share your desktop</button>
+<script>
+var matches = location.search.match(/\?url=(.*)/);
+if (matches) {
+    $('[name="url"]').val(decodeURIComponent(matches[1]));
+}
+
+$.get('https://api.giphy.com/v1/gifs/random?api_key=0UTRbFtkMxAplrohufYco5IY74U8hOes', function(data){
+    $('#image').attr('src', data.data.image_original_url);
+});
+
+const initOptions = {
+    disableAudioLevels: false,
+
+    disableSimulcast: true,
+    // The ID of the jidesha extension for Chrome.
+    desktopSharingChromeExtId: 'mbocklcggfhnbahlnepmldehdhpjfcjp',
+
+    // Whether desktop sharing should be disabled on Chrome.
+    desktopSharingChromeDisabled: false,
+
+    // The media sources to use when using screen sharing with the Chrome
+    // extension.
+    desktopSharingChromeSources: [ 'screen', 'window' ],
+
+    // Required version of Chrome extension
+    desktopSharingChromeMinExtVersion: '0.1',
+
+    // Whether desktop sharing should be disabled on Firefox.
+    desktopSharingFirefoxDisabled: false,
+};
+
+var jitsi_domain;
+var jitsi_room;
+$('#jitsi-form').submit(function(e){
+        e.preventDefault();
+        var matches = $('[name="url"]').val().match('^https://([^/]*)/(.*)$');
+        if (!matches) {
+            alert('invalid URL');
+            return;
+        }
+        $('#jitsi-form').hide();
+        window.history.pushState('', '', '?url=' + encodeURIComponent(matches[0]));
+        jitsi_domain = matches[1];
+        jitsi_room = matches[2].toLowerCase();
+
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+        JitsiMeetJS.init(initOptions);
+		const options = {
+			hosts: {
+				domain: jitsi_domain,
+				muc: 'conference.' + jitsi_domain,
+				focus: 'focus.' + jitsi_domain,
+			},
+			bosh: 'wss://' + jitsi_domain + '/xmpp-websocket?room=' + jitsi_room,
+			websocket: 'wss://' + jitsi_domain + '/xmpp-websocket?room=' + jitsi_room,
+
+
+		   // The name of client node advertised in XEP-0115 'c' stanza
+		   clientNode: 'http://jitsi.org/jitsimeet'
+		};
+        connection = new JitsiMeetJS.JitsiConnection(null, null, options);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
+        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('connection failed'); });
+    if ($('[name="password"]').val()) {
+        connection.connect({
+            password:$('[name="password"]').val(),
+        });
+    } else {
+        connection.connect();
+    }
+});
+
+var room;
+var onConnected = function() {
+    var confOptions = {
+        openBridgeChannel: true,
+        confID: jitsi_domain + '/' + jitsi_room,
+    };
+    room = connection.initJitsiConference(jitsi_room, confOptions);
+    room.setDisplayName($('[name="bot-name"]').val());
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_FAILED,
+        function(error) {
+            alert("CONFERENCE_FAILED:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_ERROR,
+        function(error) {
+            alert("CONFERENCE_ERROR:" + error);
+        });
+    room.on(
+        JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+        function(){
+            $('#share-desktop').show();
+            update_user_list();
+            room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
+                    update_user_list();
+            });
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, update_track);
+            room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, update_track);
+        });
+
+    if ($('[name="password"]').val()) {
+        room.join($('[name="password"]').val());
+    } else {
+        room.join();
+    }
+}
+
+onLocalTracks = function(tracks) {
+    for (let i = 0; i < tracks.length; i++) {
+        room.addTrack(tracks[i]);
+    }
+    $('#image').css('height', '100%').css('width', '100%');
+    $('#share-desktop').hide();
+    $('#image').show();
+    document.title = old_title;
+};
+
+var old_title = '';
+$('#share-desktop').click(function(e){
+    old_title = document.title;
+    document.title = 'CHOOSE ME!!!!!!!!';
+    JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+    .then(onLocalTracks)
+    .catch(error => {
+    });
+});
+
+$(window).bind('beforeunload', unload);
+$(window).bind('unload', unload);
+function unload() {
+    if (room) {
+        room.leave();
+    }
+    if (connection) {
+		connection.disconnect();
+    }
+}
+
+</script>
+</body>
+</html>
