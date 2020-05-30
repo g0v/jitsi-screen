@@ -1102,6 +1102,12 @@ var onConnected = function() {
                     }
                     update_user_list();
             });
+            room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (id, user) => {
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('display_name_changed', {id: id, name: user.getDisplayName()});
+                    }
+                    update_user_list();
+            });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.attach($('#audio-' + track.ownerEndpointId)[0]);
