@@ -576,7 +576,6 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     check_resize(win, width, height);
     init_win_env(win);
     $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
-    current_data.scenes[scene_id].win = win;
     windows[idx] = win;
     update_screen_video();
 });
