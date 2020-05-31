@@ -801,6 +801,11 @@ $('#btn-access-audio').click(function(e){
 });
 
 var update_screen_video = function(){
+    for (var id in selected_users) {
+        if (selected_users[id] == 'select') {
+            delete(selected_users[id]);
+        }
+    }
     for (var idx in windows) {
         var user_select = current_data.screens[idx].user_select;
         win = windows[idx];
@@ -852,8 +857,8 @@ var update_screen_video = function(){
                 video_dom.show();
                 if (tracks.length) {
                     tracks[0].attach(video_dom[0]);
-                    if ($(this).data('select') == 'true') {
-                        room.selectParticipant(user_id);
+                    if ($(this).attr('data-select') == 'true') {
+                        selected_users[user_id] = 'select';
                     }
 
                     video_dom[0].__track = tracks[0];
@@ -862,7 +867,17 @@ var update_screen_video = function(){
             }
         });
     }
+    reselected_users();
 };
+
+var reselected_users = function(){
+    var users = [];
+    for (var user_id in selected_users) {
+        users.push(user_id);
+    }
+    room.selectParticipants(users);
+};
+var selected_users = {};
 
 var update_user_list = function(){
     $('#user-list').html('');
@@ -1105,6 +1120,15 @@ var onConnected = function() {
                     }
             });
 
+            room.on(JitsiMeetJS.events.conference.PARTICIPANT_CONN_STATUS_CHANGED, (id, status) => {
+                    if (status == 'inactive' && 'undefined' === typeof(selected_users[id])) {
+                        selected_users[id] = 'restoring';
+                        reselected_users();
+                    } else if (status == 'active' && 'restoring' === selected_users[id]) {
+                        delete(selected_users[id]);
+                        reselected_users();
+                    }
+            });
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
