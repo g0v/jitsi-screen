@@ -528,6 +528,8 @@ $('#form-screen-choose').submit(function(e){
     win.onunload = function(){
         $('#screen-choose-body-' + idx + ' .btn-reopen').show();
         $('#screen-choose-body-' + idx + ' .btn-focus').hide();
+        win._isUnloading = true;
+        auto_detach_track();
     };
     $(win.document.body).css('margin', 0);
     $('.video-box', win.document).ready(function(){
@@ -537,6 +539,22 @@ $('#form-screen-choose').submit(function(e){
 
     // XXX
 });
+
+var auto_detach_track = function(){
+    if (!room) {
+        return;
+    }
+    for (var id in room.participants) {
+        for (var track of room.participants[id]._tracks) {
+            for (var container of track.containers) {
+                var win = container.getRootNode().defaultView;
+                if (win === null || win._isUnloading) {
+                    track.detach(container);
+                }
+            }
+        }
+    }
+};
 
 $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
     e.preventDefault();
@@ -575,7 +593,14 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     $('#screen-choose-body-' + idx + ' .btn-focus').show();
     check_resize(win, width, height);
     init_win_env(win);
-    $(win.document.body).html(current_data.scenes[scene_id].content).css('margin', 0);
+    win.document.open();
+    win.document.write(current_data.scenes[scene_id].content);
+    win.onunload = function(){
+        $('#screen-choose-body-' + idx + ' .btn-reopen').show();
+        $('#screen-choose-body-' + idx + ' .btn-focus').hide();
+        win._isUnloading = true;
+        auto_detach_track();
+    };
     windows[idx] = win;
     update_screen_video();
 });
