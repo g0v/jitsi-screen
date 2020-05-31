@@ -838,6 +838,16 @@ var update_screen_video = function(){
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.hide();
+            } else if (user_id == 'viewer') {
+                var track = room.getLocalVideoTrack();
+                var old_track = video_dom[0].__track;
+                if (old_track) {
+                    old_track.detach(video_dom[0]);
+                }
+                video_dom.show();
+                track.attach(video_dom[0]);
+                video_dom[0].__track = track;
+                video_dom[0].play();
             } else if (user_id.match && user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
@@ -931,6 +941,10 @@ var update_user_list = function(){
             option_dom.html('Camera ' + device.label).val('camera-' + device.deviceId);
             $(this).append(option_dom);
         }
+
+        option_dom = $('<option></option>');
+        option_dom.text('viewer').val('viewer');
+        $(this).append(option_dom);
 
         if (room) {
             option_dom = $('<option></option>');
