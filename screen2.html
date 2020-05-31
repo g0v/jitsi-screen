@@ -876,12 +876,14 @@ var update_screen_video = function(){
                 }
 
                 var old_track = video_dom[0].__track;
-                if (old_track) {
+                if (old_track && old_track.ssrc != tracks[0].ssrc) {
                     old_track.detach(video_dom[0]);
                 }
                 video_dom.show();
                 if (tracks.length) {
-                    tracks[0].attach(video_dom[0]);
+                    if (!old_track || old_track.ssrc != tracks[0].ssrc) {
+                        tracks[0].attach(video_dom[0]);
+                    }
                     if ($(this).attr('data-select') == 'true') {
                         selected_users[user_id] = 'select';
                     }
