@@ -540,22 +540,6 @@ $('#form-screen-choose').submit(function(e){
     // XXX
 });
 
-var auto_detach_track = function(){
-    if (!room) {
-        return;
-    }
-    for (var id in room.participants) {
-        for (var track of room.participants[id]._tracks) {
-            for (var container of track.containers) {
-                var win = container.getRootNode().defaultView;
-                if (win === null || 'undefined' === typeof(win) || win._isUnloading) {
-                    track.detach(container);
-                }
-            }
-        }
-    }
-};
-
 $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];

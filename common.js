@@ -51,3 +51,19 @@ var init_win_env = function(win, preview){
     };
 };
 
+var auto_detach_track = function(){
+    if (!room) {
+        return;
+    }
+    for (var id in room.participants) {
+        for (var track of room.participants[id]._tracks) {
+            for (var container of track.containers) {
+                var win = container.getRootNode().defaultView;
+                if (win === null || 'undefined' === typeof(win) || win._isUnloading) {
+                    track.detach(container);
+                }
+            }
+        }
+    }
+};
+
