@@ -50,3 +50,20 @@ var init_win_env = function(win, preview){
         }
     };
 };
+
+var restore_video_track = function()
+{
+    var inactive_tracks = [];
+    for (var id in room.participants) {
+        if (room.participantConnectionStatus.connectionStatusMap[id].connectionStatus == 'inactive') {
+            inactive_tracks.push(id);
+        }
+    };
+    if (inactive_tracks.length == 0) {
+        return;
+    }
+    console.log('restoring ' + inactive_tracks.join(','));
+    var old_selected_tracks = room.rtc._selectedEndpoints;
+    room.selectParticipants(inactive_tracks);
+    room.selectParticipants(old_selected_tracks);
+}
