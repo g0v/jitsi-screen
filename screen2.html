@@ -895,6 +895,13 @@ var update_screen_video = function(){
     reselected_users();
 };
 
+$('[name="bot-name"]').change(function(){
+    if (room) {
+        room.myName = $(this).val();
+        room.setDisplayName(room.myName);
+    }
+});
+
 var update_user_list = function(){
     $('#user-list').html('');
     var tr_dom = $('<tr></tr>');
@@ -1105,6 +1112,7 @@ var onConnected = function() {
     update_devices();
 
     room = connection.initJitsiConference(jitsi_room, confOptions);
+    room.myName = $('#jitsi-form [name="bot-name"]').val();
     room.setDisplayName($('#jitsi-form [name="bot-name"]').val());
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_FAILED,

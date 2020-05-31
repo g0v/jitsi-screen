@@ -15,6 +15,38 @@ var init_win_env = function(win, preview){
         }
         win.Jitsi._callbacks[event].push(callback);
     };
+    win.Jitsi.getMyID = function(){
+        if (preview) {
+            return 'me';
+        } else {
+            if (!room) {
+                return 'me';
+            }
+            return room.myUserId();
+        }
+    };
+    win.Jitsi.getUser = function(id){
+        if (preview) {
+            var first = true;
+            if ('undefined' === typeof(preview_fake_users[id])) {
+                return {};
+            }
+
+            return {id: id, name: 'User-' + id, me: id == 0};
+        } else {
+            if (!room) {
+                return [];
+            }
+            users = [];
+            if (id == room.myUserId()) {
+                var my_properties = {};
+                room.room.presMap.nodes.map(function(a){ if (a.tagName.match(/^jitsi_participant_/)) { my_properties[a.tagName.substr(18)] = a.value; }});
+                return {id: room.myUserId(), name: room.myName, me: true, properties: my_properties};
+            } else {
+                return {id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties};
+            }
+        }
+    };
     win.Jitsi.getUsers = function(){
         if (preview) {
             var first = true;
@@ -34,7 +66,7 @@ var init_win_env = function(win, preview){
             users = [];
             var my_properties = {};
             room.room.presMap.nodes.map(function(a){ if (a.tagName.match(/^jitsi_participant_/)) { my_properties[a.tagName.substr(18)] = a.value; }});
-            users.push({id: room.myUserId(), name: $('[name="name"]').val(), me: true, properties: my_properties});
+            users.push({id: room.myUserId(), name: room.myName, me: true, properties: my_properties});
             for (var id in room.participants) {
                 users.push({id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties});
             }
