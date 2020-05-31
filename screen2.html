@@ -548,7 +548,7 @@ var auto_detach_track = function(){
         for (var track of room.participants[id]._tracks) {
             for (var container of track.containers) {
                 var win = container.getRootNode().defaultView;
-                if (win === null || win._isUnloading) {
+                if (win === null || 'undefined' === typeof(win) || win._isUnloading) {
                     track.detach(container);
                 }
             }
