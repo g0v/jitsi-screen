@@ -32,9 +32,9 @@ var init_win_env = function(win, preview){
                 return [];
             }
             users = [];
-            users.push({id: room.myUserId(), name: $('[name="name"]').val(), me: true});
+            users.push({id: room.myUserId(), name: $('[name="name"]').val(), me: true, properties: room.properties});
             for (var id in room.participants) {
-                users.push({id: id, name: room.participants[id].getDisplayName(), me: false});
+                users.push({id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties});
             }
             return users;
         }
