@@ -1128,8 +1128,14 @@ var onConnected = function() {
 
             room.on(JitsiMeetJS.events.conference.PARTICIPANT_CONN_STATUS_CHANGED, (id, status) => {
                     if (status == 'inactive' && 'undefined' === typeof(selected_users[id])) {
-                        selected_users[id] = 'restoring';
-                        reselected_users();
+                        var attach_count = 0;
+                        for (var track of room.participants[id].getTracksByMediaType('video')) {
+                            attach_count += track.containers.length;
+                        }
+                        if (attach_count) {
+                            selected_users[id] = 'restoring';
+                            reselected_users();
+                        }
                     } else if (status == 'active' && 'restoring' === selected_users[id]) {
                         delete(selected_users[id]);
                         reselected_users();
