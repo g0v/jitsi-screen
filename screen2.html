@@ -826,6 +826,7 @@ $('#btn-access-audio').click(function(e){
 });
 
 var update_screen_video = function(){
+    auto_detach_track();
     for (var id in selected_users) {
         if (selected_users[id] == 'select') {
             delete(selected_users[id]);
