@@ -67,3 +67,13 @@ var auto_detach_track = function(){
     }
 };
 
+var reselected_users = function(){
+    var users = [];
+    for (var user_id in selected_users) {
+        users.push(user_id);
+    }
+    //console.log(selected_users);
+    room.selectParticipants(users);
+};
+var selected_users = {};
+

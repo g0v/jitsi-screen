@@ -885,15 +885,6 @@ var update_screen_video = function(){
     reselected_users();
 };
 
-var reselected_users = function(){
-    var users = [];
-    for (var user_id in selected_users) {
-        users.push(user_id);
-    }
-    room.selectParticipants(users);
-};
-var selected_users = {};
-
 var update_user_list = function(){
     $('#user-list').html('');
     var tr_dom = $('<tr></tr>');
