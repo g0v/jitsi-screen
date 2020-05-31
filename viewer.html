@@ -214,106 +214,6 @@ var update_screen_video = function(){
     });
 };
 
-var update_user_list = function(){
-    $('#user-list').html('');
-    var tr_dom = $('<tr></tr>');
-    tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text('[me]' + $('[name="name"]').val())).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
-    var td_dom = $('<td></td>');
-    if (room) {
-        tr_dom.attr('id', 'user-list-' + room.myUserId());
-    } else {
-        tr_dom.attr('id', 'user-list-me');
-    }
-    td_dom.append($('<i class="fas microphone-stat"></i>'));
-    td_dom.append($('<i class="fas video-stat fa-video"></i>'));
-    tr_dom.append(td_dom);
-
-    if (!room || !room.getLocalAudioTrack()) {
-        $('.microphone-stat', td_dom).addClass('fa-microphone-alt-slash');
-    } else {
-        $('.microphone-stat', td_dom).addClass('fa-microphone-alt');
-    }
-    if (!room || !room.getLocalVideoTrack()) {
-        $('.video-stat', td_dom).addClass('fa-video-slash');
-    } else {
-        $('.video-stat', td_dom).addClass('fa-video');
-    }
-
-    $('#user-list').append(tr_dom);
-
-    $('.user-select').each(function(){
-        var current_user = null;
-        if (!$(this).is('.new')) {
-            current_user = $(this).val();
-        } else {
-            $(this).removeClass('new');
-        }
-        
-        $(this).html('');
-        option_dom = $('<option></option>');
-        option_dom.html('不顯示').val('none');
-        $(this).append(option_dom);
-
-
-        for (var device of device_list.video) {
-            var option_dom = $('<option></option>');
-            option_dom.html('Camera ' + device.label).val('camera-' + device.deviceId);
-            $(this).append(option_dom);
-        }
-
-        if (room) {
-            option_dom = $('<option></option>');
-            option_dom.html('自己').val(room.myUserId());
-            $(this).append(option_dom);
-            for (var id in room.participants) {
-                var option_dom = $('<option></option>');
-                option_dom.html(id + '. ' + room.participants[id].getDisplayName()).val(id);
-                $(this).append(option_dom);
-            }
-        }
-
-        if (null !== current_user) {
-            $(this).val(current_user);
-        }
-    });
-
-    if (room) {
-        for (var id in room.participants) {
-            var tr_dom = $('<tr></tr>');
-            tr_dom.attr('id', 'user-list-' + id);
-            tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text(room.participants[id].getDisplayName())).attr('title', id).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
-            var td_dom = $('<td></td>');
-            td_dom.append($('<i class="fas microphone-stat"></i>'));
-            td_dom.append($('<i class="fas video-stat fa-video"></i>'));
-            tr_dom.append(td_dom);
-            audio_track = room.participants[id].getTracksByMediaType('audio')[0];
-            if (!audio_track || audio_track.muted) {
-                $('.microphone-stat', td_dom).addClass('fa-microphone-alt-slash');
-            } else {
-                $('.microphone-stat', td_dom).addClass('fa-microphone-alt');
-            }
-
-            if (audio_track && !$(`#audio-${id}`).length) {
-                var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
-                $('#user-list').append(audio_dom);
-                audio_track.attach(audio_dom[0]);
-            }
-            var audio_dom = $(`#audio-${id}`)[0];
-            if (audio_dom && audio_dom.muted) {
-                $('.microphone-stat', td_dom).addClass('disable');
-            }
-
-            video_track = room.participants[id].getTracksByMediaType('video')[0];
-            if (!video_track || video_track.muted) {
-                $('.video-stat', td_dom).addClass('fa-video-slash');
-            } else {
-                $('.video-stat', td_dom).addClass('fa-video');
-            }
-            $('#user-list').append(tr_dom);
-        }
-    }
-};
-
 var room;
 var device_list = {audio: [], video: []};
 
@@ -324,13 +224,11 @@ $('#output-audio').change(function(){
         if (track.getType() != 'audio') continue;
         promises.push(room.removeTrack(track));
     }
-    $(`#user-list-${room.myUserId()} .microphone-stat`).removeClass('fa-microphone-alt').addClass('fa-microphone-alt-slash');
 
     Promise.all(promises).then(function(){
         if ('none' == id) {
         } else {
             get_local_audio_track(id, function(track){
-                $(`#user-list-${room.myUserId()} .microphone-stat`).removeClass('fa-microphone-alt-slash').addClass('fa-microphone-alt');
                 room.addTrack(track);
             });
         }
@@ -371,7 +269,6 @@ var update_devices = function(tracks) {
             }
         });
     }
-    update_user_list();
 };
 
 var onConnected = function() {
@@ -416,7 +313,6 @@ var onConnected = function() {
                     audio_track.attach(audio_dom[0]);
                 }
             }
-            update_user_list();
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
@@ -425,28 +321,23 @@ var onConnected = function() {
                     for (var idx in windows) {
                         windows[idx].Jitsi.fire('user_joined', {id: id, name: user.getDisplayName()});
                     }
-                    update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.USER_LEFT, (id, user) => {
                     for (var idx in windows) {
                         windows[idx].Jitsi.fire('user_left', {id: id, name: user.getDisplayName()});
                     }
-                    update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.attach($('#audio-' + track.ownerEndpointId)[0]);
                     }
-                    update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.detach($('#audio-' + track.ownerEndpointId)[0]);
                     }
-                    update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, (track) => {
-                    update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
@@ -499,13 +390,6 @@ var update_content = function(){
         $('#result-iframe')[0].contentDocument.write(content);
     }
     update_screen_video();
-};
-
-var level_changed = function(participant, audioLevel){
-    var width = $(`#user-list-${participant} .audiolevel-area`).parent().outerWidth();
-    $(`#user-list-${participant} .audiolevel-area`).css({
-        right: Math.floor((1 - audioLevel) * width),
-    });
 };
 
 var local_tracks = {};
