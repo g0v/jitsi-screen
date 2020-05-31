@@ -32,7 +32,9 @@ var init_win_env = function(win, preview){
                 return [];
             }
             users = [];
-            users.push({id: room.myUserId(), name: $('[name="name"]').val(), me: true, properties: room.properties});
+            var my_properties = {};
+            room.room.presMap.nodes.map(function(a){ if (a.tagName.match(/^jitsi_participant_/)) { my_properties[a.tagName.substr(18)] = a.value; }});
+            users.push({id: room.myUserId(), name: $('[name="name"]').val(), me: true, properties: my_properties});
             for (var id in room.participants) {
                 users.push({id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties});
             }
