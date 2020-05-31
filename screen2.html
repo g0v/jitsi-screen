@@ -834,6 +834,9 @@ var update_screen_video = function(){
     for (var idx in windows) {
         var user_select = current_data.screens[idx].user_select;
         win = windows[idx];
+        if (win.closed) {
+            continue;
+        }
         $('.video-box', win.document).each(function(){
             var data_id = $(this).data('id');
             user_id = user_select[$(this).attr('data-id')];
