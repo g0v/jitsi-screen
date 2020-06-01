@@ -823,7 +823,6 @@ var update_screen_video = function(){
             continue;
         }
         $('.video-box', win.document).each(function(){
-            var data_id = $(this).data('id');
             user_id = user_select[$(this).attr('data-id')];
             if ('undefined' === typeof(user_id)) {
                 user_id = $(this).attr('data-user');
