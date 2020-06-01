@@ -1202,11 +1202,17 @@ var onConnected = function() {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.attach($('#audio-' + track.ownerEndpointId)[0]);
                     }
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('track_added', {track: track});
+                    }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.detach($('#audio-' + track.ownerEndpointId)[0]);
+                    }
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('track_removed', {track: track});
                     }
                     update_user_list();
             });
