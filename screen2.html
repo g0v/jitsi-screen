@@ -1163,6 +1163,12 @@ var onConnected = function() {
                         reselected_users();
                     }
             });
+            room.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, (user, text, ts) => {
+                    var id = user.getId();
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('property_changed', {id: id, text: text});
+                    }
+            });
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
