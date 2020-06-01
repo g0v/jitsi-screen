@@ -104,8 +104,34 @@ var reselected_users = function(){
     for (var user_id in selected_users) {
         users.push(user_id);
     }
-    //console.log(selected_users);
+    console.log(selected_users);
     room.selectParticipants(users);
 };
 var selected_users = {};
+
+var restore_inactive_track = function(){
+    for (var id in room.participants) {
+        var status = room.participantConnectionStatus.connectionStatusMap[id];
+        var attach_count = 0;
+
+        if ('undefined' === typeof(status)) {
+            continue;
+        }
+        status = status.connectionStatus;
+
+        for (var track of room.participants[id]._tracks) {
+            if (track.type != 'video') {
+                continue;
+            }
+            attach_count += track.containers.length;
+        }
+        if (status == 'inactive' && 'undefined' === typeof(selected_users[id]) && attach_count > 0) {
+            selected_users[id] = 'restoring';
+            reselected_users();
+        } else if (status == 'active' && 'restoring' === selected_users[id]) {
+            delete(selected_users[id]);
+            reselected_users();
+        }
+    }
+};
 
