@@ -43,6 +43,9 @@ var init_win_env = function(win, preview){
                 room.room.presMap.nodes.map(function(a){ if (a.tagName.match(/^jitsi_participant_/)) { my_properties[a.tagName.substr(18)] = a.value; }});
                 return {id: room.myUserId(), name: room.myName, me: true, properties: my_properties};
             } else {
+                if ('undefined' === typeof(room.participants[id])) {
+                    return null;
+                }
                 return {id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties};
             }
         }
