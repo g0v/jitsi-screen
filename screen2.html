@@ -844,10 +844,14 @@ var update_screen_video = function(){
                 if (old_track) {
                     old_track.detach(video_dom[0]);
                 }
-                video_dom.show();
-                track.attach(video_dom[0]);
-                video_dom[0].__track = track;
-                video_dom[0].play();
+                if (track) {
+                    track.attach(video_dom[0]);
+                    video_dom.show();
+                    video_dom[0].__track = track;
+                    video_dom[0].play();
+                } else {
+                    video_dom.hide();
+                }
             } else if (user_id.match && user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
@@ -870,6 +874,7 @@ var update_screen_video = function(){
                 } else if ('undefined' !== typeof(room.participants[user_id])) {
                     var tracks = room.participants[user_id].getTracksByMediaType('video');
                 } else {
+                    video_dom.hide();
                     return;
                 }
 
@@ -877,7 +882,6 @@ var update_screen_video = function(){
                 if (old_track && old_track.ssrc != tracks[0].ssrc) {
                     old_track.detach(video_dom[0]);
                 }
-                video_dom.show();
                 if (tracks.length) {
                     if (!old_track || old_track.ssrc != tracks[0].ssrc) {
                         tracks[0].attach(video_dom[0]);
@@ -886,8 +890,11 @@ var update_screen_video = function(){
                         selected_users[user_id] = 'select';
                     }
 
+                    video_dom.show();
                     video_dom[0].__track = tracks[0];
                     video_dom[0].play();
+                } else {
+                    video_dom.hide();
                 }
             }
         });
