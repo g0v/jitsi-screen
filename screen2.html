@@ -609,7 +609,7 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     $('#screen-choose-body-' + idx + ' .btn-reopen').hide();
     $('#screen-choose-body-' + idx + ' .btn-focus').show();
     check_resize(win, width, height);
-    init_win_env(win, false, event_listener, screen_id);
+    init_win_env(win, false, event_listener, idx);
     win.document.open();
     win.document.write(current_data.scenes[scene_id].content);
     win.onunload = function(){
