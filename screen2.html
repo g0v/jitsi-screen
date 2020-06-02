@@ -432,7 +432,13 @@ var event_listener = function(event, screen_id, values){
             form_dom.data('action_name', name);
             form_dom.on('submit', function(e){
                 e.preventDefault();
-
+                if (room) {
+                    room.broadcastEndpointMessage({type: 'run_action', message: {
+                        screen_id: screen_id,
+                        action_name: $(this).data('action_name'),
+                        params: [],
+                    }});
+                }
                 var win = windows[screen_id];
                 if (win.closed) {
                     return;
