@@ -1,6 +1,22 @@
-var init_win_env = function(win, preview){
+var init_win_env = function(win, preview, event_listener, screen_id){
     win.Jitsi = {};
     win.Jitsi._callbacks = {};
+    win.Jitsi._actions = {};
+    win.Jitsi._event_listener = event_listener;
+    win.Jitsi._screen_id = screen_id;
+    win.Jitsi.addAction = function(action, callback, params) {
+        win.Jitsi._actions[action] = {
+            callback: callback,
+            params: params,
+        }
+        win.Jitsi._event_listener('action_add', win.Jitsi._screen_id, win.Jitsi._actions);
+    };
+    win.Jitsi.runAction = function(action, params) {
+        if ('undefined' === win.Jitsi._actions[action]) {
+            return;
+        }
+        win.Jitsi._actions[action].callback(params);
+    };
     win.Jitsi.fire = function(event, data){
         if ('undefined' === typeof(win.Jitsi._callbacks[event])) {
             return;

@@ -192,6 +192,7 @@ body {
                       畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
                       尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
                       <div class="custom-box"></div>
+                      <div class="action-box"></div>
                       <button type="submit">新增</button>
                   </form>
               </div>
@@ -205,6 +206,7 @@ body {
                       畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
                       尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
                       <div class="custom-box"></div>
+                      <div class="action-box"></div>
                   </form>
               </div>
               </script>
@@ -411,10 +413,35 @@ var update_preview_content = function(content){
         preview_fake_counter ++;
         preview_fake_users.push(preview_fake_counter);
     }
-    init_win_env($('#preview-iframe')[0].contentWindow, true);
+    init_win_env($('#preview-iframe')[0].contentWindow, true, function(){}, 0);
     $('#preview-iframe')[0].contentDocument.open();
     $('#preview-iframe')[0].contentDocument.write(content);
     update_preview_video();
+};
+
+var event_listener = function(event, screen_id, values){
+    if (event == 'action_add') {
+        var action_box = $('#screen-choose-body-' + screen_id + ' .action-box');
+        action_box.html('');
+
+        for (var name in values) {
+            var form_dom = $('<form></form>');
+            form_dom.append($('<span></span>').text(name));
+            form_dom.append($('<button type="submit">Action</button>'));
+            form_dom.data('action_values', values[name]);
+            form_dom.data('action_name', name);
+            form_dom.on('submit', function(e){
+                e.preventDefault();
+
+                var win = windows[screen_id];
+                if (win.closed) {
+                    return;
+                }
+                win.Jitsi.runAction($(this).data('action_name'), []);
+            });
+            action_box.append(form_dom);
+        }
+    }
 };
 
 var update_screen_data = function(){
@@ -517,7 +544,7 @@ $('#form-screen-choose').submit(function(e){
 
     var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
     check_resize(win, width, height);
-    init_win_env(win);
+    init_win_env(win, false, event_listener, idx);
     win.document.open();
     win.document.write(current_data.scenes[scene_id].content);
     if (title) {
@@ -576,7 +603,7 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     $('#screen-choose-body-' + idx + ' .btn-reopen').hide();
     $('#screen-choose-body-' + idx + ' .btn-focus').show();
     check_resize(win, width, height);
-    init_win_env(win);
+    init_win_env(win, false, event_listener, screen_id);
     win.document.open();
     win.document.write(current_data.scenes[scene_id].content);
     win.onunload = function(){
