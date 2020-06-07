@@ -865,7 +865,7 @@ var update_screen_video = function(){
             }
             var video_dom = $('video', this);
             $(this).attr('data-result-user', user_id);
-            if (user_id == 'none') {
+            if ('undefined' === typeof(user_id) || user_id == 'none') {
                 var old_track = video_dom[0].__track;
                 if (old_track) {
                     old_track.detach(video_dom[0]);
