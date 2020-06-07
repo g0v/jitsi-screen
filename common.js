@@ -41,6 +41,16 @@ var init_win_env = function(win, preview, event_listener, screen_id){
             return room.myUserId();
         }
     };
+    win.Jitsi.updateProperty = function(name, value) {
+        if (preview) {
+            return true;
+        } else {
+            if (!room) {
+                return true;
+            }
+            room.setLocalParticipantProperty(name, value);
+        }
+    };
     win.Jitsi.getUser = function(id){
         if (preview) {
             var first = true;
