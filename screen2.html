@@ -178,9 +178,13 @@ label {
   width: 100%;
   height: 100%;
 }
-#preview-html {
-  white-space: pre;
-  overflow: auto;
+#preview-html > div {
+  position: relative;
+}
+#btn-scene-editor-save {
+  position: absolute;
+  bottom: 10%;
+  right: 20px;
 }
 </style>
 </head>
@@ -243,8 +247,6 @@ label {
     <div class="card main-card-left" id="card-userlist">
       <div class="card-header text-light bg-secondary">
     	  成員列表
-    	  <!--button class="btn btn-dark btn-sm" type="button" id="btn-scene-editor-preview">更新預覽</button>
-    	  <button class="btn btn-dark btn-sm" type="button" id="btn-scene-editor-save">儲存</button-->
       </div>
       <div class="card-body">
         <table class="table">
@@ -274,8 +276,10 @@ label {
         預覽<span></span><button class="btn btn-secondary" id="btn-preview-html" style="">&lt;/&gt;</button>
       </div>
       <div class="card-body">
-        <div id="preview-html" class="d-none container-fluid h-100">
-
+        <div id="preview-html" class="d-none">
+          <textarea class="container-fluid h-100">
+          </textarea>
+          <button class="btn btn-secondary btn-sm" type="button" id="btn-scene-editor-save">儲存</button>
         </div>
         <iframe id="preview-iframe"></iframe>
       </div>
@@ -285,7 +289,7 @@ label {
             <input type="text" name="width" value="1600" size="5">
             <span class="px-1">x</span>
             <input type="text" name="height" value="900" size="5">
-            <button class="btn btn-secondary btn-lg mx-1" type="submit"><i class="fas fa-sync"></i></button>
+            <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
             <span>｜</span>
             <label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;">
           </form>
@@ -294,6 +298,7 @@ label {
     <div class="card main-card-right" id="card-scene-choose">
       <div class="card-header text-light bg-secondary">
     	  場景列表
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增場景</button>
       </div>
       <div class="card-body">
     	<ol id="scene-list"></ol>
@@ -389,8 +394,12 @@ var load_data = function(data){
 		li_dom.data('id', scene_id);
 		$('#scene-list').append(li_dom);
 	}
-    current_data = data;
-    update_scene_choose();
+  var temp_current_data = JSON.parse(localStorage.getItem('current_data'));
+  console.log(temp_current_data);
+  current_data = data;
+  if(temp_current_data != null){
+    current_data.scenes = temp_current_data.scenes;
+  }
 };
 
 $(function(){
@@ -398,39 +407,6 @@ $(function(){
         load_data(default_data);
     });
 });
-/*
-$('#scene-chooser').change(function(){
-    var scene_id = $('#scene-chooser').val();
-    var user_list = get_list_from_content(current_data.scenes[scene_id].content);
-    var div_dom = $('#form-screen-new');
-    $('.custom-box', div_dom).html('');
-    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span><div class="add-viewer-block"></div>');
-    var viewer_dom = $('<select></select>').addClass('viewer-select');
-    viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
-    $('.custom-box .add-viewer-block', div_dom).append(viewer_dom);
-    $('.custom-box .add-viewer-block', div_dom).append($('<button class="btn-add-viewer btn btn-dark"><i class="fas fa-plus"></i></button>'));
-    user_list.map(function(id){
-        $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
-        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('name', 'user-select[' + id + ']'));
-        $('.custom-box', div_dom).append('<br>');
-    });
-    update_user_list();
-    var scene = current_data.scenes[scene_id];
-    update_preview_content(scene.content);
-    update_preview_size();
-});*/
-
-var update_scene_choose = function(){
-    $('#scene-chooser').html('');
-	for (var scene_id in current_data.scenes) {
-        var option_dom = $('<option></option>');
-		var scene = current_data.scenes[scene_id];
-        option_dom.attr('value', scene_id).text(scene.name);
-        $('#scene-chooser').append(option_dom);
-	}
-    $('#scene-chooser').change();
-    update_user_list();
-};
 
 $('#resize-form [name="preview-user"]').change(function(){
     var win = $('#preview-iframe')[0].contentWindow;
@@ -493,6 +469,10 @@ var update_preview_video = function(){
         ctx.stroke();
 
         var row = 0;
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 4;
+        ctx.fillStyle = 'white';
+        ctx.strokeText(id, canvas.width / 2, canvas.height / 2 + text_height / 2);
         ctx.fillText(id, canvas.width / 2, canvas.height / 2 + text_height / 2);
 
         var width = canvas.width;
@@ -523,7 +503,7 @@ var update_preview_video = function(){
 
 var update_preview_content = function(content){
   //editor.setData(content);
-  $("#preview-html").text(content);
+  $("#preview-html textarea").val(content);
 
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
   for (var i = 0; i < preview_fake_user; i ++) {
@@ -534,13 +514,18 @@ var update_preview_content = function(content){
   $('#preview-iframe')[0].contentDocument.open();
   $('#preview-iframe')[0].contentDocument.write(content);
   $('#preview-iframe')[0].contentDocument.close();
-  update_preview_video();
   $('#preview-iframe').contents().find('html').css('overflow', 'hidden');
   scene_id = $("#preview-iframe").data('scene_id');
   $("#card-scene-preview .card-header span").text("｜"+current_data.scenes[scene_id].name)
   update_preview_size();
-  //setTimeout(function(){ update_preview_size(); }, 1000);
+  update_preview_video();
 };
+
+$('#btn-scene-editor-save').click(function(e){
+    var content = $('#preview-html textarea').val();
+    current_data.scenes[$('#preview-iframe').data('scene_id')].content = content;
+    localStorage.setItem('current_data', JSON.stringify(current_data));
+});
 
 var event_listener = function(event, screen_id, values){
     if (event == 'action_add') {
@@ -774,6 +759,11 @@ $('#btn-screen-choose-add').click(function(e){
     $('#screen-choose-body-new').show();
 });
 
+
+$('#btn-scene-choose-add').click(function(e){
+    e.preventDefault();
+});
+
 $('#screen-list').on('click', '.screen-item', function(e){
     e.preventDefault();
     $('#screen-choose-body-area .screen-choose-body').hide();
@@ -786,8 +776,8 @@ $('#screen-list').on('click', '.screen-item', function(e){
     var scene_id = $('#screen-choose-body-' + idx).data('scene_id');
     var scene = current_data.scenes[scene_id];
     $("#preview-iframe").data('scene_id', scene_id);
-    update_preview_content(scene.content);
-    update_preview_size();
+
+    update_preview_content(scenes.content);
 
 });
 
@@ -797,7 +787,6 @@ $('#scene-list').on('click', '.btn-preview', function(e){
   var scene = current_data.scenes[scene_id];
   $("#preview-iframe").data('scene_id', scene_id);
   update_preview_content(scene.content);
-  update_preview_size();
 });
 
 var update_preview_size = function() {
@@ -828,7 +817,8 @@ var update_preview_size = function() {
 
 $('#resize-form').submit(function(e){
     e.preventDefault();
-    update_preview_size();
+    var temp_content = $("#preview-html textarea").val();
+    update_preview_content(temp_content);
 });
 
 var matches = location.search.match(/\?url=(.*)/);
@@ -1543,6 +1533,7 @@ $('#main-card-left-toggler').on('click',function(e){
 var toggle_html = false;
 $('#btn-preview-html').on('click', function(e) {
     e.preventDefault();
+
     if(toggle_html) {
       $(this).removeClass("active");
       $('#preview-html').addClass("d-none");
@@ -1554,6 +1545,8 @@ $('#btn-preview-html').on('click', function(e) {
       $('#preview-iframe').addClass("d-none");
     }
     toggle_html = !toggle_html;
+    var temp_content = $("#preview-html textarea").val();
+    update_preview_content(temp_content);
 });
 
 $(window).bind('beforeunload', unload);

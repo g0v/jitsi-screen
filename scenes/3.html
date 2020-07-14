@@ -24,8 +24,12 @@ var update_user = function(){
 
 
     $('#video-pool').html('');
+    var user_count = 0;
     for (var user of users) {
         $('#video-pool').append($('<div></div>').attr('data-user', user.id).addClass('video-box'));
+        user_count+=1;
+        if(user_count >= 16)
+          break;
     }
     Jitsi.reload();
 };
