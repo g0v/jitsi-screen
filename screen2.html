@@ -275,7 +275,7 @@ label {
       </div>
       <div class="card-body">
         <div id="preview-html" class="d-none container-fluid h-100">
-          <div id="editor" class=""></div>
+
         </div>
         <iframe id="preview-iframe"></iframe>
       </div>
@@ -363,7 +363,7 @@ var default_data = {
     scenes: {},
 	screens: [],
 };
-var loading_scenes = [1,2,3,4,5,6,7,8,9];
+var loading_scenes = [1,2,3];
 var loading_promises = [];
 var message_logs = [];
 for (var id of loading_scenes) {
@@ -392,15 +392,6 @@ var load_data = function(data){
     current_data = data;
     update_scene_choose();
 };
-
-ClassicEditor
-  .create( document.querySelector( '#editor' ) )
-  .then( editor => {
-          console.log( editor );
-  } )
-  .catch( error => {
-          console.error( error );
-  } );
 
 $(function(){
     Promise.all(loading_promises).then(function(){
@@ -531,7 +522,8 @@ var update_preview_video = function(){
 };
 
 var update_preview_content = function(content){
-  editor.setData(content);
+  //editor.setData(content);
+  $("#preview-html").text(content);
 
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
   for (var i = 0; i < preview_fake_user; i ++) {
