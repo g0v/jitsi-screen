@@ -1,3 +1,13 @@
+/*
+ * Event list
+ * - user_joined
+ * - user_left
+ * - user_box_updated
+ * - property_changed
+ * - display_name_changed
+ * - track_added
+ * - track_removed
+ */
 var init_win_env = function(win, preview, event_listener, screen_id){
     win.Jitsi = {};
     win.Jitsi._callbacks = {};
@@ -51,6 +61,16 @@ var init_win_env = function(win, preview, event_listener, screen_id){
             room.setLocalParticipantProperty(name, value);
         }
     };
+    win.Jitsi.sendTextMessage = function(text) {
+        if (preview) {
+            return true;
+        } else {
+            if (!room) {
+                return true;
+            }
+            room.sendTextMessage(text);
+        }
+    };
     win.Jitsi.getUser = function(id){
         if (preview) {
             var first = true;
@@ -75,6 +95,9 @@ var init_win_env = function(win, preview, event_listener, screen_id){
                 return {id: id, name: room.participants[id].getDisplayName(), me: false, properties: room.participants[id]._properties};
             }
         }
+    };
+    win.Jitsi.getMessageLog = function(){
+        return message_logs;
     };
     win.Jitsi.getUsers = function(){
         if (preview) {
@@ -138,6 +161,38 @@ var reselected_users = function(){
 };
 var selected_users = {};
 
+var video_detach = function(video_box_dom, track){
+    var video_dom = $('video', video_box_dom);
+    track.detach(video_dom[0]);
+    $(video_box_dom).addClass('no-video');
+    delete(video_dom[0].__track);
+    video_dom.hide();
+};
+
+var audio_detach = function(audio_box_dom, track){
+    var audio_dom = $('audio', audio_box_dom);
+    track.detach(audio_dom[0]);
+    $(audio_box_dom).addClass('no-audio');
+    delete(audio_dom[0].__track);
+};
+
+var audio_attach = function(audio_box_dom, track){
+    var audio_dom = $('audio', audio_box_dom);
+    track.attach(audio_dom[0]);
+    $(audio_box_dom).removeClass('no-audio');
+    audio_dom[0].__track = track;
+    audio_dom[0].play().catch(function(e){ restore_inactive_track(); });
+};
+
+var video_attach = function(video_box_dom, track){
+    var video_dom = $('video', video_box_dom);
+    video_dom.show();
+    track.attach(video_dom[0]);
+    $(video_box_dom).removeClass('no-video');
+    video_dom[0].__track = track;
+    video_dom[0].play().catch(function(e){ restore_inactive_track(); });
+};
+
 var restore_inactive_track = function(){
     for (var id in room.participants) {
         var status = room.participantConnectionStatus.connectionStatusMap[id];
@@ -163,4 +218,3 @@ var restore_inactive_track = function(){
         }
     }
 };
-

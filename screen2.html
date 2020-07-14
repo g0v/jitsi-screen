@@ -4,41 +4,76 @@
 <title>分割畫面小幫手 :: 線上揪松 Jothon Online</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
+<link rel="stylesheet" href="assets/styles/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;400;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<script src="https://www.youtube.com/iframe_api"></script>
-<script src="//meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
+<script src="//jitsi.jothon.online/libs/lib-jitsi-meet.min.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/20.0.0/classic/ckeditor.js"></script>
 <script src="common.js"></script>
 <style>
 body {
-    overflow: hidden;
+  font-family: 'Noto Sans TC', sans-serif;
+  overflow: hidden;
 }
-#card-connect {
-	position: absolute:
-	top: 0%;
-	left: 0%;
-	width: 20%;
-	height: 50%;
+label {
+  padding-right: 5px;
+}
+.sections-contents {
+  font-size: 1.2rem;
+  flex: 1;
+}
+#section-login .sections-contents form {
+  width: 80%;
+}
+#section-login tr>td {
+  text-align: right;
+}
+#section-login tr .td-input {
+  width: 85%;
+  padding-bottom: 10px;
 }
 
+#main-header {
+  height: 10%;
+  border-bottom: 5px solid #DDD;
+}
+#main-scroll-area {
+  position: relative;
+  height: 100%;
+  left: 0;
+}
+#card-connect {
+	position: absolute;
+	top: 0%;
+	left: -25%;
+	width: 25%;
+	height: 45%;
+}
+#card-connect select, #card-connect input {
+  width: 100%;
+}
 #user-list .disable {
     opacity: 20%;
 }
 
-#card-member{
-	position: absolute:
-	top: 50%;
-	left: 0%;
-	width: 20%;
-	height: 50%;
-}
 #card-scene-choose {
 	position: absolute;
 	top: 0%;
-	left: 20%;
-	width: 40%;
-	height: 50%;
+	left: 75%;
+	width: 25%;
+	height: 30%;
+}
+#scene-list li>div {
+  padding-top: 5px;
+  display: flex;
+}
+#scene-list .scene-list-title {
+  width: calc(100% - 5em);
+}
+#scene-list li button {
+  margin-left: auto;
 }
 
 .user-list-name {
@@ -55,45 +90,77 @@ body {
     background-color: rgba(128, 255, 128);
 }
 
-#card-screen-choose {
+#card-screen-list {
 	position: absolute;
-	top: 50%;
-	left: 20%;
-	width: 40%;
-	height: 50%;
+	top: 60%;
+	left: 75%;
+	width: 25%;
+	height: 30%;
 }
-#card-screen-choose .row {
-    height: 100%;
-}
-#card-screen-choose #screen-list-div {
-    overflow: scroll;
-    height: 100%;
-}
-#card-scene-editor{
+#card-screen-settings {
 	position: absolute;
-	top: 0%;
-	left: 60%;
-	width: 40%;
-	height: 50%;
+	top: 30%;
+	left: 75%;
+	width: 25%;
+	height: 30%;
+}
+#card-screen-settings .add-viewer-block select {
+  width: calc(100% - 3em);
+  padding: 1px 2px;
+}
+#card-screen-settings .add-viewer-block button {
+  margin: 0;
+  margin-left: 5px;
+}
+#card-screen-settings button {
+  margin: 2.5px 5px 2.5px 0;
+}
+.nav-pills .screen-item.active {
+  background-color: #343a40;
+}
+.screen-choose-body input[name="width"], .screen-choose-body input[name="height"] {
+  width: calc(50% - 1em);
+}
+#card-userlist{
+	position: absolute;
+	top: 45%;
+	left: -25%;
+	width: 25%;
+	height: 45%;
 }
 #card-scene-preview {
 	position: absolute;
-	top: 50%;
-	left: 60%;
-	width: 40%;
-	height: 50%;
+	top: 0%;
+	left: 0%;
+	width: 75%;
+	height: 90%;
+}
+.card {
+  border: 0;
+  border-radius: 0 !important;
+}
+.main-card-right {
+  border-left: 1px solid #6c757d;
+}
+.main-card-left {
+  border-right: 1px solid #6c757d;
+}
+.card-header {
+  border-radius: 0 !important;
+}
+.card-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 0 !important;
 }
 #card-scene-preview .card-body {
     padding: 0;
 }
-#card-member .card-body {
-    overflow: auto;
-}
-#card-scene-choose .card-body {
-    overflow: auto;
-}
-#card-screen-choose .card-body {
-    overflow: auto;
+#btn-preview-html {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border-radius: 0;
 }
 #form-scene-editor {
 	display: flex;
@@ -106,154 +173,199 @@ body {
 #form-scene-editor #textarea-scene-editor-content {
 	flex: 1;
 }
-#card-scene-choose .card-body {
-	overflow: scroll;
-}
 #preview-iframe {
-    width: 100%;
-    height: 100%;
+  border: 0;
+  width: 100%;
+  height: 100%;
+}
+#preview-html {
+  white-space: pre;
+  overflow: auto;
 }
 </style>
 </head>
 <body>
-
-<div class="card" id="card-connect">
-  <div class="card-header">
-	登入
+<div class="flex-column" id="section-login" style="display: flex; height: 100vh;">
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Jitsi Screen Helper 畫面小幫手</a>
+  </nav>
+  <div class="d-flex sections-contents justify-content-center text-center">
+    <form class="align-self-center" method="post" id="jitsi-form">
+      <h2 class="m-4">登入</h2>
+      <table class="m-auto">
+        <tr>
+          <td><label for="login-url" class="form-label">Jisi URL：</label></td>
+          <td class="td-input"><input type="text" name="url" id="login-url" class="form-control" placeholder="請輸入jitsi畫面連結網址..." value="https://jitsi.jothon.online/g0vjothonhelper" required="required"></td>
+        </tr>
+        <tr>
+          <td><label for="login-pw" class="form-label">Password：</label></td>
+          <td class="td-input"><input type="password" name="password" id="login-pw" class="form-control" placeholder="請設定密碼...(選填)"></td>
+        </tr>
+        <tr>
+          <td><label for="login-name" class="form-label">Bot Name：</label></td>
+          <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control" placeholder="請輸入管理員名稱..." value="Jothon Helper" required="required"></td>
+        </tr>
+      </table>
+      <button type="submit" class="btn btn-lg btn-dark px-4 m-4">開始使用</button>
+    </form>
   </div>
-  <div class="card-body">
-    <form method="post" id="jitsi-form">
-		Jitsi URL: <input type="text" name="url" value="https://meet.jit.si/jothontest"><br>
-		Password: <input type="password" name="password"><br>
-		Bot Name: <input type="text" name="bot-name" value="Jothon Helper"><br>
-		<button type="submit">Go</button>
-	</form>
-    <div id="logined-area" style="display:none">
-        <div>
-            畫面：
-            <select id="output-video" style="display:none"></select>
-            <button id="btn-access-video">同意使用攝影機</button>
+</div>
+<div class="d-none" id="section-main">
+  <nav class="navbar navbar-dark bg-dark" id="main-header">
+    <button class="btn btn-secondary mr-4" id="main-card-left-toggler"><i class="fas fa-sliders-h"></i></button>
+    <a class="navbar-brand" href="#">Jitsi Screen Helper 畫面小幫手</a>
+    <ul class="navbar-nav ml-auto">
+      <a class="bot-name" style="border-right: 2px solid; padding-right: 1rem; color: #DDD;"></a>
+    </ul>
+  </nav>
+  <div id="main-scroll-area">
+    <div class="card main-card-left" id="card-connect">
+      <div class="card-header text-light bg-secondary">
+    	登入資訊
+      </div>
+      <div class="card-body">
+        <div id="logined-area" style="display:none">
+            <div>
+                畫面：
+                <select id="output-video" style="display:none"></select>
+                <button id="btn-access-video">同意使用攝影機</button>
+            </div>
+            <div>
+                聲音：
+                <select id="output-audio" style="display:none"></select>
+                <button id="btn-access-audio">同意使用麥克風</button>
+            </div>
+            Jitsi URL: <span id="jitsi-url"></span><br>
+    		Bot Name: <input type="text" name="bot-name" value=""><br>
         </div>
-        <div>
-            聲音：
-            <select id="output-audio" style="display:none"></select>
-            <button id="btn-access-audio">同意使用麥克風</button>
+      </div>
+    </div>
+    <div class="card main-card-left" id="card-userlist">
+      <div class="card-header text-light bg-secondary">
+    	  成員列表
+    	  <!--button class="btn btn-dark btn-sm" type="button" id="btn-scene-editor-preview">更新預覽</button>
+    	  <button class="btn btn-dark btn-sm" type="button" id="btn-scene-editor-save">儲存</button-->
+      </div>
+      <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>A/V</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+            </tbody>
+        </table>
+        <div id="audio-pool"></div>
+    		<!--form id="form-scene-editor">
+    			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
+    				<div class="input-group-prepend">
+    					<span class="input-group-text" id="inputGroup-sizing-sm">場景名稱</span>
+    				</div>
+    				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    			</div>
+    			<textarea class="form-control" aria-label="With textarea" name="content" id="textarea-scene-editor-content"></textarea>
+    		</form-->
+      </div>
+    </div>
+    <div class="card" id="card-scene-preview">
+      <div class="card-header text-light bg-dark">
+        預覽<span></span><button class="btn btn-secondary" id="btn-preview-html" style="">&lt;/&gt;</button>
+      </div>
+      <div class="card-body">
+        <div id="preview-html" class="d-none container-fluid h-100">
+          <div id="editor" class=""></div>
         </div>
-        Jitsi URL: <span id="jitsi-url"></span><br>
-		Bot Name: <input type="text" name="bot-name" value=""><br>
+        <iframe id="preview-iframe"></iframe>
+      </div>
+      <div class="card-footer">
+          <form id="resize-form" class="form-inline" style="margin-block-end: 0">
+            <span class="px-1">預覽尺寸</span>
+            <input type="text" name="width" value="1600" size="5">
+            <span class="px-1">x</span>
+            <input type="text" name="height" value="900" size="5">
+            <button class="btn btn-secondary btn-lg mx-1" type="submit"><i class="fas fa-sync"></i></button>
+            <span>｜</span>
+            <label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;">
+          </form>
+      </div>
+    </div>
+    <div class="card main-card-right" id="card-scene-choose">
+      <div class="card-header text-light bg-secondary">
+    	  場景列表
+      </div>
+      <div class="card-body">
+    	<ol id="scene-list"></ol>
+      </div>
+    </div>
+    <div class="card main-card-right" id="card-screen-list">
+      <div class="card-header text-light bg-secondary">
+    	  畫面選擇列表
+    	  <button class="btn btn-dark btn-sm" type="button" id="btn-screen-choose-add"><i class="fas fa-plus"></i> 新增畫面</button>
+      </div>
+      <div class="card-body">
+        <div id="screen-list-div">
+            <div class="nav flex-column nav-pills" id="screen-list" role="tablist" aria-orientation="vertical">
+            </div>
+            <script type="text/html" id="tmpl-screen-list-item">
+                  <a class="nav-link screen-item" href="#" role="tab"></a>
+            </script>
+        </div>
+
+      </div>
+    </div>
+    <div class="card main-card-right" id="card-screen-settings">
+    <div class="card-header text-light bg-secondary">
+  	  畫面設定｜
+      <span>新增畫面</span>
+  	</div>
+    <div class="card-body">
+      <div id="screen-choose-body-area">
+        <div class="screen-choose-body" id="screen-choose-body-new">
+            <form class="m-0" id="form-screen-new">
+              <!--label for="scene-chooser">選擇場景</label><select id="scene-chooser" name="scene-chooser"></select><br-->
+              <label for="title">畫面標題</label><input type="text" placeholder="可不輸入" name="title"><br>
+              <!--尺寸(本機)：<br>
+              <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
+              <div class="custom-box"></div>
+              <div class="action-box"></div-->
+              <button class="btn btn-dark btn-lg mt-3" type="submit">新增預覽至列表</button>
+            </form>
+        </div>
+        <script type="text/html" id="tmpl-screen-choose-body">
+          <div class="screen-choose-body">
+              <form class="form-screen-choose">
+                  視窗動作：<button class="btn-focus btn btn-dark">最上層</button>
+                    <button class="btn-reopen btn btn-dark">重新開啟</button>
+                    <button class="btn-reupdate btn btn-dark">重新繪製</button>
+                <br>
+                  場景名稱：<span class="scene-chooser"></span><br>
+                  畫面標題：<span class="screen-title"></span><br>
+                  尺寸(本機)：<br>
+                  <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
+                  <hr>
+                  <div class="custom-box"></div>
+                  <div class="action-box"></div>
+              </form>
+          </div>
+        </script>
+      </div>
     </div>
   </div>
-</div>
-<div class="card" id="card-member">
-  <div class="card-header">
-	  成員
-  </div>
-  <div class="card-body">
-      <table class="table">
-          <thead>
-              <tr>
-                  <th>Name</th>
-                  <th>A/V</th>
-              </tr>
-          </thead>
-          <tbody id="user-list">
-          </tbody>
-      </table>
-      <div id="audio-pool"></div>
-  </div>
-</div>
-<div class="card" id="card-scene-choose">
-  <div class="card-header">
-	  場景列表
-  </div>
-  <div class="card-body">
-	<ol id="scene-list"></ol>
-  </div>
-</div>
-<div class="card" id="card-screen-choose">
-  <div class="card-header">
-	  畫面選擇
-	  <button class="btn btn-primary btn-sm" type="button" id="btn-screen-choose-add">新增畫面</button>
-  </div>
-  <div class="card-body">
-      <div class="row">
-          <div class="col-3" id="screen-list-div">
-              <div class="nav flex-column nav-pills" id="screen-list" role="tablist" aria-orientation="vertical">
-              </div>
-              <script type="text/html" id="tmpl-screen-list-item">
-                    <a class="nav-link screen-item" href="#" role="tab"></a>
-              </script>
-          </div>
-          <div class="col-9" id="screen-choose-body-area">
-              <div class="screen-choose-body" id="screen-choose-body-new">
-                  <h3>新增畫面</h3>
-                  <form id="form-screen-choose">
-                      選擇場景：<select id="screen-chooser"></select><br>
-                      畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
-                      尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
-                      <div class="custom-box"></div>
-                      <div class="action-box"></div>
-                      <button type="submit">新增</button>
-                  </form>
-              </div>
-              <script type="text/html" id="tmpl-screen-choose-body">
-              <div class="screen-choose-body">
-                  <h3>新增畫面</h3>
-                  <form class="form-screen-choose">
-                      視窗動作：<button class="btn-focus">最上層</button>
-                        <button class="btn-reopen">重新開啟</button><br>
-                      選擇場景：<span class="screen-chooser"></span><br>
-                      畫面標題：<input type="text" placeholder="可不輸入" name="title"><br>
-                      尺寸：<input type="text" name="width" value="1600" size="5"> x <input type="text" name="height" value="900" size="5"><Br>
-                      <div class="custom-box"></div>
-                      <div class="action-box"></div>
-                  </form>
-              </div>
-              </script>
-          </div>
-      </div>
-  </div>
-</div>
-<div class="card" id="card-scene-editor">
-  <div class="card-header">
-	  場景編輯
-	  <button class="btn btn-primary btn-sm" type="button" id="btn-scene-editor-preview">更新預覽</button>
-	  <button class="btn btn-primary btn-sm" type="button" id="btn-scene-editor-save">儲存</button>
-  </div>
-  <div class="card-body">
-		<form id="form-scene-editor">
-			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
-				<div class="input-group-prepend">
-					<span class="input-group-text" id="inputGroup-sizing-sm">場景名稱</span>
-				</div>
-				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
-			</div>
-			<textarea class="form-control" aria-label="With textarea" name="content" id="textarea-scene-editor-content"></textarea>
-		</form>
-  </div>
-</div>
-<div class="card" id="card-scene-preview">
-  <div class="card-header">
-      <form id="resize-form" class="form-inline" style="margin-block-end: 0">
-	  場景預覽
-          <input type="text" name="width" value="1600" size="5"> x 
-          <input type="text" name="height" value="900" size="5"> 
-          <button class="btn btn-primary btn-sm" type="submit">更新預覽尺寸</button>
-      線上人數:
-      <input type="number" name="preview-user" value="4">
-      </form>
-  </div>
-  <div class="card-body">
-      <iframe id="preview-iframe"></iframe>
   </div>
 </div>
 <script>
+
+var jitsi_login_data = {};
+
 var default_data = {
     scenes: {},
 	screens: [],
 };
-var loading_scenes = [1,2,3];
+var loading_scenes = [1,2,3,4,5,6,7,8,9];
 var loading_promises = [];
+var message_logs = [];
 for (var id of loading_scenes) {
     loading_promises.push($.get('scenes/' + id + '.html').then(function(text){
         id = text.split("\n")[0];
@@ -270,51 +382,62 @@ var windows = {};
 
 var load_data = function(data){
 	for (var scene_id in data.scenes) {
-		var li_dom = $('<li></li>');
+		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
 		var scene = data.scenes[scene_id];
-		li_dom.text(scene.name);
-		li_dom.append($('<button></button>').text('編輯預覽').addClass('btn btn-primary btn-sm btn-preview'));
+    $(".scene-list-title",li_dom).text(scene.name);
+		$("div",li_dom).append($('<button></button>').text('場景預覽').addClass('btn btn-dark btn-sm btn-preview'));
 		li_dom.data('id', scene_id);
 		$('#scene-list').append(li_dom);
 	}
     current_data = data;
-    update_screen_choose();
+    update_scene_choose();
 };
+
+ClassicEditor
+  .create( document.querySelector( '#editor' ) )
+  .then( editor => {
+          console.log( editor );
+  } )
+  .catch( error => {
+          console.error( error );
+  } );
 
 $(function(){
     Promise.all(loading_promises).then(function(){
         load_data(default_data);
     });
 });
-
-$('#screen-chooser').change(function(){
-    var scene_id = $('#screen-chooser').val();
+/*
+$('#scene-chooser').change(function(){
+    var scene_id = $('#scene-chooser').val();
     var user_list = get_list_from_content(current_data.scenes[scene_id].content);
-    var div_dom = $('#form-screen-choose');
+    var div_dom = $('#form-screen-new');
     $('.custom-box', div_dom).html('');
-    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span>');
+    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span><div class="add-viewer-block"></div>');
     var viewer_dom = $('<select></select>').addClass('viewer-select');
     viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
-    $('.custom-box', div_dom).append(viewer_dom);
-    $('.custom-box', div_dom).append($('<button class="btn-add-viewer">+</button>'));
-    $('.custom-box', div_dom).append('<br>');
+    $('.custom-box .add-viewer-block', div_dom).append(viewer_dom);
+    $('.custom-box .add-viewer-block', div_dom).append($('<button class="btn-add-viewer btn btn-dark"><i class="fas fa-plus"></i></button>'));
     user_list.map(function(id){
         $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
         $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).attr('name', 'user-select[' + id + ']'));
         $('.custom-box', div_dom).append('<br>');
     });
     update_user_list();
-});
+    var scene = current_data.scenes[scene_id];
+    update_preview_content(scene.content);
+    update_preview_size();
+});*/
 
-var update_screen_choose = function(){
-    $('#screen-chooser').html('');
+var update_scene_choose = function(){
+    $('#scene-chooser').html('');
 	for (var scene_id in current_data.scenes) {
         var option_dom = $('<option></option>');
 		var scene = current_data.scenes[scene_id];
         option_dom.attr('value', scene_id).text(scene.name);
-        $('#screen-chooser').append(option_dom);
+        $('#scene-chooser').append(option_dom);
 	}
-    $('#screen-chooser').change();
+    $('#scene-chooser').change();
     update_user_list();
 };
 
@@ -353,8 +476,8 @@ var update_preview_video = function(){
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, 800, 450);
         ctx.textAlign = 'center';
-        ctx.fillStyle = 'black';
-        ctx.font = 'normal 200px Arial';
+        ctx.fillStyle = 'white';
+        ctx.font = 'normal 100px Arial';
 
         var metric = ctx.measureText(id);
         text_height = metric.actualBoundingBoxAscent + metric.actualBoundingBoxDescent;
@@ -408,15 +531,23 @@ var update_preview_video = function(){
 };
 
 var update_preview_content = function(content){
-    var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
-    for (var i = 0; i < preview_fake_user; i ++) {
-        preview_fake_counter ++;
-        preview_fake_users.push(preview_fake_counter);
-    }
-    init_win_env($('#preview-iframe')[0].contentWindow, true, function(){}, 0);
-    $('#preview-iframe')[0].contentDocument.open();
-    $('#preview-iframe')[0].contentDocument.write(content);
-    update_preview_video();
+  editor.setData(content);
+
+  var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
+  for (var i = 0; i < preview_fake_user; i ++) {
+      preview_fake_counter ++;
+      preview_fake_users.push(preview_fake_counter);
+  }
+  init_win_env($('#preview-iframe')[0].contentWindow, true, function(){}, 0);
+  $('#preview-iframe')[0].contentDocument.open();
+  $('#preview-iframe')[0].contentDocument.write(content);
+  $('#preview-iframe')[0].contentDocument.close();
+  update_preview_video();
+  $('#preview-iframe').contents().find('html').css('overflow', 'hidden');
+  scene_id = $("#preview-iframe").data('scene_id');
+  $("#card-scene-preview .card-header span").text("｜"+current_data.scenes[scene_id].name)
+  update_preview_size();
+  //setTimeout(function(){ update_preview_size(); }, 1000);
 };
 
 var event_listener = function(event, screen_id, values){
@@ -427,7 +558,7 @@ var event_listener = function(event, screen_id, values){
         for (var name in values) {
             var form_dom = $('<form></form>');
             form_dom.append($('<span></span>').text(name));
-            form_dom.append($('<button type="submit">Action</button>'));
+            form_dom.append($('<button type="submit" class="btn btn-dark">Action</button>'));
             form_dom.data('action_values', values[name]);
             form_dom.data('action_name', name);
             form_dom.on('submit', function(e){
@@ -456,7 +587,9 @@ var update_screen_data = function(){
         var screen = current_data.screens[idx];
         var title = '畫面 ' + idx;
         if (screen.title) {
-            title += ' : ' + screen.title;
+          title += ' : ' + screen.title;
+        } else {
+          title += ' : ' + current_data.scenes[screen.scene_id].name;
         }
         var item_dom = $($('#tmpl-screen-list-item').html()).text(title);
         item_dom.attr('id', 'screen-item-' + idx);
@@ -489,94 +622,106 @@ var get_list_from_content = function(content){
     return list;
 };
 
-$('#form-screen-choose').submit(function(e){
+$('#form-screen-new').submit(function(e){
 	e.preventDefault();
-    var scene_id = $('#screen-chooser').val();
-    var title = $('[name="title"]', this).val();
-    var width = parseInt($('[name="width"]', this).val());
-    var height = parseInt($('[name="height"]', this).val());
-    var user_select = {};
+  var scene_id = $("#preview-iframe").data('scene_id');
+  if(scene_id == null){
+    return;
+  }
+  var title = $('[name="title"]', this).val();
+  /*
+  var width = parseInt($('[name="width"]', this).val());
+  var height = parseInt($('[name="height"]', this).val());*/
+  var width = parseInt($('#resize-form [name="width"]').val());
+  var height = parseInt($('#resize-form [name="height"]').val());
+  var user_select = {};
 
-    $('#form-screen-choose .user-select').each(function(){
-        user_select[$(this).data('id')] = $(this).val();
-    });
+  $('#form-screen-new .user-select').each(function(){
+      user_select[$(this).data('id')] = $(this).val();
+  });
 
-    var idx = current_data.screens.length;
-    current_data.screens.push({
-        scene_id: scene_id,
-        title: title,
-        width: width,
-        height: height,
-        viewers: $('#form-screen-choose .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray(),
-        user_select: user_select,
-    });
-    var div_dom = $($('#tmpl-screen-choose-body').html());
-    $('h3', div_dom).text('畫面 ' + idx + ' ' + title);
-    $('.screen-chooser', div_dom).text(current_data.scenes[scene_id].name);
-    $('[name="title"]', div_dom).val(title);
-    $('[name="width"]', div_dom).val(width);
-    $('[name="height"]', div_dom).val(height);
-    var user_list = get_list_from_content(current_data.scenes[scene_id].content);
-    $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span>');
-    current_data.screens[idx].viewers.map(function(viewer){
-            $('.viewer-list', div_dom).append($('<button></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
-    });
-    var viewer_dom = $('<select></select>').addClass('viewer-select');
-    viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
-    $('.custom-box', div_dom).append(viewer_dom);
-    $('.custom-box', div_dom).append($('<button class="btn-add-viewer">+</button>'));
-    $('.custom-box', div_dom).append('<br>');
-    user_list.map(function(id){
-        $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
-        $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).addClass('user-select-' + id));
-        $('.custom-box', div_dom).append('<br>');
-    });
-    div_dom.attr('id', 'screen-choose-body-' + idx).data('screen_id', idx);
+  var idx = current_data.screens.length;
+  current_data.screens.push({
+      scene_id: scene_id,
+      title: title,
+      width: width,
+      height: height,
+      viewers: $('#form-screen-new .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray(),
+      user_select: user_select,
+  });
+  var div_dom = $($('#tmpl-screen-choose-body').html());
+  $('.scene-chooser', div_dom).text(current_data.scenes[scene_id].name);
+  $('.screen-title', div_dom).text(title);
+  $('[name="width"]', div_dom).val(width);
+  $('[name="height"]', div_dom).val(height);
+  var user_list = get_list_from_content(current_data.scenes[scene_id].content);
+  $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span><div class="add-viewer-block"></div>');
+  current_data.screens[idx].viewers.map(function(viewer){
+    $('.viewer-list', div_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+  });
+  var viewer_dom = $('<select></select>').addClass('viewer-select');
+  viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
+  $('.custom-box .add-viewer-block', div_dom).append(viewer_dom);
+  $('.custom-box .add-viewer-block', div_dom).append($('<button class="btn-add-viewer btn btn-dark"><i class="fas fa-plus"></i></button>'));
+  user_list.map(function(id){
+      $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
+      $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).addClass('user-select-' + id));
+      $('.custom-box', div_dom).append('<br>');
+  });
+  div_dom.attr('id', 'screen-choose-body-' + idx).data('screen_id', idx).data('scene_id', scene_id);
 
-    $('#screen-choose-body-area').append(div_dom);
-    update_user_list();
-    user_list.map(function(id){
-        $('.user-select-' + id).each(function(){
-            $(this).val($('#form-screen-choose [name="user-select[' + id + ']"]').val());
-        });
-    });
+  $('#screen-choose-body-area').append(div_dom);
+  $('#card-screen-settings .card-header span').text('畫面 ' + idx + ' ' + title);
+  update_user_list();
+  user_list.map(function(id){
+      $('.user-select-' + id).each(function(){
+          $(this).val($('#form-screen-new [name="user-select[' + id + ']"]').val());
+      });
+  });
 
-    $('#screen-choose-body-area .screen-choose-body').hide();
-    $('.btn-reopen', div_dom).hide();
-    div_dom.show();
-    update_screen_data();
-    $('.screen-item').removeClass('active');
-    $('#screen-item-' + idx).addClass('active');
+  $('#screen-choose-body-area .screen-choose-body').hide();
+  $('.btn-reopen', div_dom).hide();
+  div_dom.show();
+  update_screen_data();
+  $('.screen-item').removeClass('active');
+  $('#screen-item-' + idx).addClass('active');
 
-    var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
-    check_resize(win, width, height);
-    init_win_env(win, false, event_listener, idx);
-    win.document.open();
-    win.document.write(current_data.scenes[scene_id].content);
-    if (title) {
-        win.document.title = '畫面 ' + title;
-    } else {
-        win.document.title = '畫面 ' + idx;
-    }
-    win.onunload = function(){
-        $('#screen-choose-body-' + idx + ' .btn-reopen').show();
-        $('#screen-choose-body-' + idx + ' .btn-focus').hide();
-        win._isUnloading = true;
-        auto_detach_track();
-    };
-    $(win.document.body).css('margin', 0);
-    $('.video-box', win.document).ready(function(){
-        update_screen_video();
-    });
-    windows[idx] = win;
+  var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
+  check_resize(win, width, height);
+  init_win_env(win, false, event_listener, idx);
+  win.document.open();
+  win.document.write(current_data.scenes[scene_id].content);
+  if (title) {
+      win.document.title = '畫面 ' + title;
+  } else {
+      win.document.title = '畫面 ' + idx;
+  }
+  win.onunload = function(){
+      $('#screen-choose-body-' + idx + ' .btn-reopen').show();
+      $('#screen-choose-body-' + idx + ' .btn-focus').hide();
+      win._isUnloading = true;
+      auto_detach_track();
+  };
+  $(win.document.body).css('overflow', 'hidden');
+  $(win.document.body).css('margin', 0);
+  $('.video-box', win.document).ready(function(){
+      update_screen_video();
+  });
+  windows[idx] = win;
 
-    // XXX
+  // XXX
 });
 
 $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
     windows[idx].focus();
+});
+
+$('#screen-choose-body-area').on('click', '.btn-reupdate', function(e){
+    e.preventDefault();
+    var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
+    windows[idx].Jitsi.reload();
 });
 
 $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
@@ -593,10 +738,13 @@ $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
 $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
-    width = current_data.screens[idx].width;
-    height = current_data.screens[idx].height;
+    var width = parseInt($('#screen-choose-body-' + idx + ' [name="width"]').val());
+    var height = parseInt($('#screen-choose-body-' + idx + ' [name="height"]').val());
+    console.log(width+"/"+height);
+    /*width = current_data.screens[idx].width;
+    height = current_data.screens[idx].height;*/
     scene_id = current_data.screens[idx].scene_id;
-    var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + (height + 100) + ',width=' + (width + 100));
+    var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
     if (current_data.screens[idx].title) {
         win.document.title = '畫面 ' + current_data.screens[idx].title;
     } else {
@@ -618,14 +766,19 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
         win._isUnloading = true;
         auto_detach_track();
     };
+    $(win.document.body).css('overflow', 'hidden');
+    $(win.document.body).css('margin', 0);
+    $('.video-box', win.document).ready(function(){
+        update_screen_video();
+    });
     windows[idx] = win;
-    update_screen_video();
 });
 
 $('#btn-screen-choose-add').click(function(e){
     e.preventDefault();
     $('#screen-choose-body-area .screen-choose-body').hide();
     $('.screen-item').removeClass('active');
+    $('#card-screen-settings .card-header span').text("新增畫面");
     $('#screen-choose-body-new').show();
 });
 
@@ -635,37 +788,40 @@ $('#screen-list').on('click', '.screen-item', function(e){
     $('.screen-item').removeClass('active');
     var idx = $(this).attr('id').split('-')[2];
     $('#screen-choose-body-' + idx).show();
+    $('#card-screen-settings .card-header span').text($(this).text());
     $(this).addClass('active');
+
+    var scene_id = $('#screen-choose-body-' + idx).data('scene_id');
+    var scene = current_data.scenes[scene_id];
+    $("#preview-iframe").data('scene_id', scene_id);
+    update_preview_content(scene.content);
+    update_preview_size();
+
 });
 
 $('#scene-list').on('click', '.btn-preview', function(e){
 	e.preventDefault();
-    var scene = current_data.scenes[$(this).parents('li').data('id')];
-    $('#form-scene-editor').data('scene_id', $(this).parents('li').data('id'));
-    $('#form-scene-editor [name="name"]').val(scene.name);
-    $('#form-scene-editor [name="content"]').val(scene.content);
-    update_preview_content(scene.content);
+  var scene_id = $(this).parents('li').data('id');
+  var scene = current_data.scenes[scene_id];
+  $("#preview-iframe").data('scene_id', scene_id);
+  update_preview_content(scene.content);
+  update_preview_size();
 });
 
-$('#btn-scene-editor-preview').click(function(e){
-    var content = $('#form-scene-editor [name="content"]').val();
-    update_preview_content(content);
-});
-
-$('#btn-scene-editor-save').click(function(e){
-    var content = $('#form-scene-editor [name="content"]').val();
-    current_data.scenes[$('#form-scene-editor').data('scene_id')].content = content;
-});
-
-var update_preview_size = function(){
-    var width = parseInt($('#card-scene-preview .card-header [name="width"]').val());
-    var height = parseInt($('#card-scene-preview .card-header [name="height"]').val());
+var update_preview_size = function() {
+    if($('#preview-iframe').contents().find('body').width() == null) {
+      setTimeout(function(){ update_preview_size(); }, 100);
+      return;
+    }
+    var width = parseInt($('#resize-form [name="width"]').val());
+    var height = parseInt($('#resize-form [name="height"]').val());
 
     var body_width = $('#card-scene-preview .card-body')[0].scrollWidth;
     var body_height = $('#card-scene-preview .card-body')[0].scrollHeight;
 
     var ratio = width / height;
     var actual_width, actual_height;
+
     if (body_height * ratio > body_width) {
         actual_width = body_width;
         actual_height = body_width / ratio;
@@ -675,10 +831,9 @@ var update_preview_size = function(){
     }
     $('#preview-iframe').width(actual_width);
     $('#preview-iframe').height(actual_height);
-    $($('#preview-iframe')[0].contentDocument.body).css('zoom', actual_width / width).css('margin', 0);
+    $('#preview-iframe').contents().find('body').css('zoom', actual_width / width).css('margin', 0);
 };
 
-update_preview_size();
 $('#resize-form').submit(function(e){
     e.preventDefault();
     update_preview_size();
@@ -724,12 +879,14 @@ $('#jitsi-form').submit(function(e){
             alert('網址不正確');
             return;
         }
-        $('#jitsi-form').hide();
+        $("#section-login").addClass("d-none");
+        $("#section-main").removeClass("d-none");
+        $("#section-main .bot-name").text("Bot: "+$('#jitsi-form [name="bot-name"]').val());
         window.history.pushState('', '', '?url=' + encodeURIComponent(matches[0]));
         jitsi_domain = matches[1];
         jitsi_room = matches[2].toLowerCase();
 
-        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.INFO);
         JitsiMeetJS.init(initOptions);
 		const options = {
 			hosts: {
@@ -772,7 +929,7 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
             return;
         }
     }
-    $('.viewer-list', box_dom).append($('<button></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+    $('.viewer-list', box_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
     var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
     if ('undefined' === typeof(screen_id)) {
         return;
@@ -791,10 +948,27 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
         }
     }
     current_data.screens[screen_id].viewers = $('.btn-delete-viewer', box_dom).map(function(a){ return $(this).data('viewer'); }).toArray()
-    if (room) {
-        room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
+    if (room && has_scene_to_response()) {
+        console.log('broadcast scenes to all viewers');
+        current_data.version = (new Date).getTime();
+        room.setLocalParticipantProperty('scene_version', current_data.version);
+        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data()});
     }
 });
+
+var get_scene_data = function(){
+    var scenes = {};
+    for (var screen_id in current_data.screens) {
+        if (current_data.screens[screen_id].viewers.length) {
+            scenes[current_data.screens[screen_id].scene_id] = current_data.scenes[current_data.screens[screen_id].scene_id];
+        }
+    }
+    return {current_data: {
+        screens: current_data.screens,
+        scenes: scenes,
+        version: current_data.version,
+    }};
+};
 
 $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
     e.preventDefault();
@@ -807,7 +981,9 @@ $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
     }
     current_data.screens[screen_id].viewers = $('.btn-delete-viewer', box_dom).map(function(a){ return $(this).data('viewer'); }).toArray()
     if (room) {
-        room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
+        current_data.version = (new Date).getTime();
+        room.setLocalParticipantProperty('scene_version', current_data.version);
+        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data()});
     }
 });
 
@@ -821,7 +997,9 @@ $('#screen-choose-body-area').on('change', '.user-select', function(e){
     $('.user-select', screen_choose_body_dom).each(function(){
         current_data.screens[screen_id].user_select[$(this).data('id')] = $(this).val();
     });
-    room.broadcastEndpointMessage({type: 'update_scene', message: {current_data: current_data}});
+    current_data.version = (new Date).getTime();
+    room.setLocalParticipantProperty('scene_version', current_data.version);
+    room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data()});
     update_screen_video();
 });
 
@@ -861,43 +1039,41 @@ var update_screen_video = function(){
                 user_id = $(this).attr('data-user');
             }
             if (!$('video', this).length) {
-                $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
+                $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
+                $(this).addClass('no-video');
+            }
+            if (!$('audio', this).length) {
+                $(this).append($('<audio autoplay="1"></audio>'));
+                $(this).addClass('no-audio');
             }
             var video_dom = $('video', this);
+            var audio_dom = $('audio', this);
             $(this).attr('data-result-user', user_id);
             if ('undefined' === typeof(user_id) || user_id == 'none') {
                 var old_track = video_dom[0].__track;
                 if (old_track) {
-                    old_track.detach(video_dom[0]);
+                    video_detach(this, old_track);
                 }
-                video_dom.hide();
             } else if (user_id == 'viewer') {
                 var track = room.getLocalVideoTrack();
                 var old_track = video_dom[0].__track;
                 if (old_track) {
-                    old_track.detach(video_dom[0]);
+                    video_detach(this, old_track);
                 }
                 if (track) {
-                    track.attach(video_dom[0]);
-                    video_dom.show();
-                    video_dom[0].__track = track;
-                    video_dom[0].play();
-                } else {
-                    video_dom.hide();
+                    video_attach(this, track);
                 }
             } else if (user_id.match && user_id.match(/^camera-/)) {
                 var device_id = user_id.split('-')[1];
                 get_local_video_track(device_id, function(track){
                     var old_track = video_dom[0].__track;
                     if (old_track) {
-                        old_track.detach(video_dom[0]);
+                        video_detach(this, old_track);
                     }
-                    video_dom.show();
-                    track.attach(video_dom[0]);
-                    video_dom[0].__track = track;
-                    video_dom[0].play();
+                    video_attach(this, track);
                 });
             } else {
+                var audio_track = null;
                 if (user_id == room.myUserId()) {
                     var track = room.getLocalVideoTrack();
                     var tracks = [];
@@ -906,28 +1082,44 @@ var update_screen_video = function(){
                     }
                 } else if ('undefined' !== typeof(room.participants[user_id])) {
                     var tracks = room.participants[user_id].getTracksByMediaType('video');
+                    audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
+                    if ($(this).is('.audio-mute')) {
+                        audio_track = null;
+                    }
                 } else {
-                    video_dom.hide();
+                    var old_track = video_dom[0].__track;
+                    if (old_track) {
+                        video_detach(this, old_track);
+                    }
+                    old_track = audio_dom[0].__track;
+                    if (old_track) {
+                        audio_detach(this, old_track);
+                    }
                     return;
                 }
 
                 var old_track = video_dom[0].__track;
-                if (old_track && old_track.ssrc != tracks[0].ssrc) {
-                    old_track.detach(video_dom[0]);
+                if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
+                    video_detach(this, old_track);
                 }
                 if (tracks.length) {
-                    if (!old_track || old_track.ssrc != tracks[0].ssrc) {
-                        tracks[0].attach(video_dom[0]);
+                    if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
+                        video_attach(this, tracks[0]);
                     }
                     if ($(this).attr('data-select') == 'true') {
                         selected_users[user_id] = 'select';
                     }
+                }
 
-                    video_dom.show();
-                    video_dom[0].__track = tracks[0];
-                    video_dom[0].play();
-                } else {
-                    video_dom.hide();
+                var old_track = audio_dom[0].__track;
+                if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
+                    audio_detach(this, old_track);
+                }
+                if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
+                    audio_attach(this, audio_track);
+                }
+                if (audio_track && $('audio', this)[0].paused) {
+                    $('audio', this)[0].play();
                 }
             }
         });
@@ -937,10 +1129,11 @@ var update_screen_video = function(){
 };
 
 $('[name="bot-name"]').change(function(){
-    if (room) {
-        room.myName = $(this).val();
-        room.setDisplayName(room.myName);
-    }
+  $("#section-main .bot-name").text("Bot: "+$(this).val());
+  if (room) {
+      room.myName = $(this).val();
+      room.setDisplayName(room.myName);
+  }
 });
 
 var update_user_list = function(){
@@ -977,7 +1170,7 @@ var update_user_list = function(){
         } else {
             $(this).removeClass('new');
         }
-        
+
         $(this).html('');
         option_dom = $('<option></option>');
         option_dom.html('不顯示').val('none');
@@ -1028,7 +1221,7 @@ var update_user_list = function(){
             if (audio_track && !$(`#audio-${id}`).length) {
                 var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
                 $('#user-list').append(audio_dom);
-                audio_track.attach(audio_dom[0]);
+                //audio_track.attach(audio_dom[0]);
             }
             var audio_dom = $(`#audio-${id}`)[0];
             if (audio_dom && audio_dom.muted) {
@@ -1115,12 +1308,12 @@ var update_devices = function(tracks) {
             var has_audio = false;
             for (var device of devices) {
                 if (device.kind == 'audioinput' && device.label != '') {
-                    $('#output-audio').append($('<option></option>').attr('val', device.deviceId).text(device.label));
+                    $('#output-audio').append($('<option></option>').attr('value', device.deviceId).text(device.label));
                     has_audio = true;
                     device_list.audio.push(device);
                 }
                 if (device.kind == 'videoinput' && device.label != '') {
-                    $('#output-video').append($('<option></option>').attr('val', device.deviceId).text(device.label));
+                    $('#output-video').append($('<option></option>').attr('value', device.deviceId).text(device.label));
                     has_video = true;
                     device_list.video.push(device);
                 }
@@ -1138,17 +1331,29 @@ var update_devices = function(tracks) {
     update_user_list();
 };
 
+var has_scene_to_response = function() {
+    if (current_data.screens.length == 0) {
+        return false;
+    }
+    for (var screen_id in current_data.screens) {
+        if (current_data.screens[screen_id].viewers.length) {
+            return true;
+        }
+    }
+    return false;
+};
+
 var onConnected = function() {
     var confOptions = {
-        openBridgeChannel: 'websocket',
+        openBridgeChannel: true,
         confID: jitsi_domain + '/' + jitsi_room,
-        capScreenshareBitrate: true,
-        disableRtx: false,
-        enableLayerSuspension: false,
+        p2p: {enabled: false},
+
     };
 
     $('#logined-area').show();
-    $('#jitsi-url').text('https://' + jitsi_domain + '/' + jitsi_room);
+    var jitsi_room_url = 'https://' + jitsi_domain + '/' + jitsi_room;
+    $('#jitsi-url').html(`<a href="${jitsi_room_url}" target="_blank">${jitsi_room_url}</a>`);
     $('#logined-area [name="bot-name"]').val($('#jitsi-form [name="bot-name"]').val());
     update_devices();
 
@@ -1176,16 +1381,19 @@ var onConnected = function() {
 
                 audio_track = room.participants[id].getTracksByMediaType('audio')[0];
                 if (audio_track) {
-                    audio_track.attach(audio_dom[0]);
+                    //audio_track.attach(audio_dom[0]);
                 }
             }
             update_user_list();
 
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
                     if (message.type == 'request_scene') {
-                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: {
-                                current_data: current_data
-                        }});
+                        if (has_scene_to_response()) {
+                            console.log('User ' + participant.getId() + ' requested scenes, responsed');
+                            room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data()});
+                        } else {
+                            console.log('User ' + participant.getId() + ' requested scenes, no scene to response');
+                        }
                     }
             });
 
@@ -1210,6 +1418,12 @@ var onConnected = function() {
                         windows[idx].Jitsi.fire('property_changed', {id: id, text: text});
                     }
             });
+            room.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => {
+                    message_logs.push({id: id, text: text, ts: ts});
+                    for (var idx in windows) {
+                        windows[idx].Jitsi.fire('message_received', {id: id, text: text, ts: ts});
+                    }
+            });
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
@@ -1226,15 +1440,15 @@ var onConnected = function() {
                     }
                     update_user_list();
             });
-            room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (id, user) => {
+            room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (id, name) => {
                     for (var idx in windows) {
-                        windows[idx].Jitsi.fire('display_name_changed', {id: id, name: user.getDisplayName()});
+                        windows[idx].Jitsi.fire('display_name_changed', {id: id, name: name});
                     }
                     update_user_list();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
-                        track.attach($('#audio-' + track.ownerEndpointId)[0]);
+                        //track.attach($('#audio-' + track.ownerEndpointId)[0]);
                     }
                     for (var idx in windows) {
                         windows[idx].Jitsi.fire('track_added', {track: track});
@@ -1256,6 +1470,7 @@ var onConnected = function() {
             room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
         });
 
+    room.setLocalParticipantProperty('jitsi-screen', true);
     if ($('[name="password"]').val()) {
         room.join($('[name="password"]').val());
     } else {
@@ -1292,7 +1507,7 @@ function get_local_audio_track(device_id, callback) {
         callback(local_tracks[device_id]);
         return;
     }
-    JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ], cameraDeviceId: device_id })
+    JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ], micDeviceId: device_id })
     .then(function(tracks){
         local_tracks[device_id] = tracks[0];
         tracks[0].addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, function(audioLevel) {
@@ -1317,22 +1532,51 @@ $('#user-list').on('click', '.microphone-stat', function(e){
         audio_dom.muted = true;
     }
     update_user_list();
+});
 
+var toggle_left = false;
+$('#main-card-left-toggler').on('click',function(e){
+  e.preventDefault();
+  if(toggle_left) {
+    $("#main-scroll-area").animate({left: "0%"},300);
+    $(this).removeClass("active");
+  }
+  else {
+    $("#main-scroll-area").animate({left: "25%"},300);
+    $(this).addClass("active");
+  }
+  toggle_left = !toggle_left;
+});
+
+var toggle_html = false;
+$('#btn-preview-html').on('click', function(e) {
+    e.preventDefault();
+    if(toggle_html) {
+      $(this).removeClass("active");
+      $('#preview-html').addClass("d-none");
+      $('#preview-iframe').removeClass("d-none");
+    }
+    else {
+      $(this).addClass("active");
+      $('#preview-html').removeClass("d-none");
+      $('#preview-iframe').addClass("d-none");
+    }
+    toggle_html = !toggle_html;
 });
 
 $(window).bind('beforeunload', unload);
 $(window).bind('unload', unload);
 function unload() {
-    if (room) {
-        room.leave();
-    }
-    if (connection) {
-		connection.disconnect();
-    }
+  if (room) {
+    room.leave();
+  }
+  if (connection) {
+    connection.disconnect();
+  }
 
-    for (var idx in windows) {
-        windows[idx].close();
-	}
+  for (var idx in windows) {
+    windows[idx].close();
+  }
 }
 
 </script>
