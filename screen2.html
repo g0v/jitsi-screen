@@ -61,8 +61,8 @@ label {
 #card-scene-choose {
 	position: absolute;
 	top: 0%;
-	left: 75%;
-	width: 25%;
+	left: 70%;
+	width: 30%;
 	height: 30%;
 }
 #scene-list li>div {
@@ -70,7 +70,7 @@ label {
   display: flex;
 }
 #scene-list .scene-list-title {
-  width: 12em;
+  width: 10em;
 }
 #scene-list li .btn-preview {
   margin-left: auto;
@@ -96,15 +96,15 @@ label {
 #card-screen-list {
 	position: absolute;
 	top: 60%;
-	left: 75%;
-	width: 25%;
+	left: 70%;
+	width: 30%;
 	height: 30%;
 }
 #card-screen-settings {
 	position: absolute;
 	top: 30%;
-	left: 75%;
-	width: 25%;
+	left: 70%;
+	width: 30%;
 	height: 30%;
 }
 #card-screen-settings .add-viewer-block select {
@@ -310,8 +310,11 @@ label {
     </div>
     <div class="card main-card-right" id="card-scene-choose">
       <div class="card-header text-light bg-secondary">
-    	  場景列表
+    	  場景列表｜
         <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增場景</button>
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-import"><i class="fas fa-sign-in-alt"></i> 匯入場景</button>
+        <input type="file" name="scene_file" id="scene-file-input" accept=".json" style="display: none;"/>
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-export"><i class="fas fa-sign-out-alt"></i> 匯出場景</button>
       </div>
       <div class="card-body">
     	<ol id="scene-list"></ol>
@@ -399,11 +402,9 @@ var current_data = null;
 var windows = {};
 
 var load_data = function(data){
-  var temp_current_data = JSON.parse(localStorage.getItem('current_data'));
   current_data = data;
-  if(temp_current_data != null){
-    current_data.scenes = temp_current_data.scenes;
-  }
+  localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
+  $('#scene-list').html('');
 	for (var scene_id in current_data.scenes) {
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
 		var scene = current_data.scenes[scene_id];
@@ -417,6 +418,10 @@ var load_data = function(data){
 
 $(function(){
     Promise.all(loading_promises).then(function(){
+        var temp_current_data_scenes = JSON.parse(localStorage.getItem('current_data'));
+        if(temp_current_data_scenes != null){
+          default_data.scenes = temp_current_data_scenes;
+        }
         load_data(default_data);
     });
 });
@@ -542,7 +547,7 @@ $('#btn-scene-editor-save').click(function(e){
     current_data.scenes[scene_id].content = content;
     $("#card-scene-preview .card-header span").text("｜"+ title);
     $($('a.scene-list-title')[scene_id-1]).text(title);
-    localStorage.setItem('current_data', JSON.stringify(current_data));
+    localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
 });
 
 var event_listener = function(event, screen_id, values){
@@ -794,6 +799,41 @@ $('#btn-scene-choose-add').click(function(e){
 		$('#scene-list').append(li_dom);
 });
 
+$('#btn-scene-choose-export').click(function(e){
+    e.preventDefault();
+    var a = document.createElement("a");
+    var data = current_data.scenes;
+    document.body.appendChild(a);
+    a.style = "display: none";
+
+    var json = JSON.stringify(data),
+        blob = new Blob([json], {type: "text/plain;charset=utf-8"}),
+        url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = "screen-helper.json";
+    a.click();
+    window.URL.revokeObjectURL(url);
+});
+
+$('#btn-scene-choose-import').click(function(e){
+    e.preventDefault();
+    $('#scene-file-input').click();
+});
+
+$('#scene-file-input').on('change',function(e){
+    var file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var contents = e.target.result;
+      default_data.scenes = JSON.parse(contents);
+      load_data(default_data);
+    };
+    reader.readAsText(file);
+});
+
 $('#screen-list').on('click', '.screen-item', function(e){
     e.preventDefault();
     $('#screen-choose-body-area .screen-choose-body').hide();
@@ -824,7 +864,7 @@ $('#scene-list').on('click', '.btn-delete-scene', function(e){
   if (confirm("確認刪除場景「"+scene.name+"」？")) {
     $(this).parents('li').remove();
     delete current_data.scenes[scene_id];
-    localStorage.setItem('current_data', JSON.stringify(current_data));
+    localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
   } else {
     return;
   }
