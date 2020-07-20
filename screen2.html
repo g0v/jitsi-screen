@@ -785,7 +785,7 @@ $('#btn-screen-choose-add').click(function(e){
 
 $('#btn-scene-choose-add').click(function(e){
     e.preventDefault();
-    var new_id = Object.keys(current_data.scenes).length;
+    var new_id = Object.keys(current_data.scenes).length+1;
     var scenes_new = {
         name: `new scene${new_id}`,
         content: "<h1>new scene</h1>",
