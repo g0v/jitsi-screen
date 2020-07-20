@@ -785,7 +785,12 @@ $('#btn-screen-choose-add').click(function(e){
 
 $('#btn-scene-choose-add').click(function(e){
     e.preventDefault();
-    var new_id = Object.keys(current_data.scenes).length+1;
+    var new_id = 1;
+    for(; new_id<=Object.keys(current_data.scenes).length+1; new_id++) {
+      if(current_data.scenes[new_id] == null) {
+        break;
+      }
+    }
     var scenes_new = {
         name: `new scene${new_id}`,
         content: "<h1>new scene</h1>",
@@ -797,6 +802,7 @@ $('#btn-scene-choose-add').click(function(e){
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', new_id);
 		$('#scene-list').append(li_dom);
+    console.log(current_data.scenes);
 });
 
 $('#btn-scene-choose-export').click(function(e){
