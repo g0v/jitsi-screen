@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>分割畫面小幫手 :: 線上揪松 Jothon Online</title>
+<title>揪己家 Jo Jitsi Plus :: 線上揪松 Jothon Online</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
 <link rel="stylesheet" href="assets/styles/all.min.css">
@@ -203,7 +203,7 @@ label {
 <body>
 <div class="flex-column" id="section-login" style="display: flex; height: 100vh;">
   <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Jitsi Screen Helper 畫面小幫手</a>
+    <a class="navbar-brand" href="#">揪己家 Jo Jitsi Plus</a>
   </nav>
   <div class="d-flex sections-contents justify-content-center text-center">
     <form class="align-self-center" method="post" id="jitsi-form">
@@ -229,7 +229,7 @@ label {
 <div class="d-none" id="section-main">
   <nav class="navbar navbar-dark bg-dark" id="main-header">
     <button class="btn btn-secondary mr-4" id="main-card-left-toggler"><i class="fas fa-sliders-h"></i></button>
-    <a class="navbar-brand" href="#">Jitsi Screen Helper 畫面小幫手</a>
+    <a class="navbar-brand" href="#">揪己家 Jo Jitsi Plus</a>
     <ul class="navbar-nav ml-auto">
       <a class="bot-name" style="border-right: 2px solid; padding-right: 1rem; color: #DDD;"></a>
     </ul>
@@ -289,7 +289,10 @@ label {
       </div>
       <div class="card-body">
         <div id="preview-html" class="d-none">
-          <div><label for="scene-title">場景名稱</label><input type="text" name=scene-title maxlength="12"></div>
+          <div class="p-2">
+            <label for="scene-title">場景名稱</label><input type="text" name=scene-title maxlength="12">
+            <button class="btn btn-secondary btn-sm ml-4" type="button" id="btn-editor-add-video">添加視訊</button>
+          </div>
           <textarea class="container-fluid">
           </textarea>
           <button class="btn btn-secondary btn-sm" type="button" id="btn-scene-editor-save">儲存</button>
@@ -416,13 +419,18 @@ var load_data = function(data){
 	}
 };
 
+var load_default = function() {
+  load_data(default_data);
+}
+
 $(function(){
     Promise.all(loading_promises).then(function(){
         var temp_current_data_scenes = JSON.parse(localStorage.getItem('current_data'));
+        var temp_data = JSON.parse(JSON.stringify(default_data));
         if(temp_current_data_scenes != null){
-          default_data.scenes = temp_current_data_scenes;
+          temp_data.scenes = temp_current_data_scenes;
         }
-        load_data(default_data);
+        load_data(temp_data);
     });
 });
 
@@ -802,7 +810,7 @@ $('#btn-scene-choose-add').click(function(e){
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', new_id);
 		$('#scene-list').append(li_dom);
-    console.log(current_data.scenes);
+    //console.log(current_data.scenes);
 });
 
 $('#btn-scene-choose-export').click(function(e){
@@ -834,10 +842,23 @@ $('#scene-file-input').on('change',function(e){
     var reader = new FileReader();
     reader.onload = function(e) {
       var contents = e.target.result;
-      default_data.scenes = JSON.parse(contents);
-      load_data(default_data);
+      var temp_data = JSON.parse(JSON.stringify(default_data));
+      temp_data.scenes = JSON.parse(contents);
+      load_data(temp_data);
     };
     reader.readAsText(file);
+});
+
+$('#btn-editor-add-video').click(function(e){
+  e.preventDefault();
+  var id_list = get_list_from_content($('#preview-html textarea').val());
+  var i = 1;
+  for(; i<= id_list.length; i++) {
+    if(id_list[i-1] != i) {
+      break;
+    }
+  }
+  $('#preview-html textarea').val($('#preview-html textarea').val()+ `\n<div class="video-box" data-id="${i}" data-select="true"></div>`);
 });
 
 $('#screen-list').on('click', '.screen-item', function(e){
