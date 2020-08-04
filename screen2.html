@@ -387,20 +387,9 @@ var default_data = {
     scenes: {},
 	screens: [],
 };
-var loading_scenes = [1,2,3];
-var loading_promises = [];
+
+var scene_config = 'scenes/scenes.json';
 var message_logs = [];
-for (var id of loading_scenes) {
-    loading_promises.push($.get('scenes/' + id + '.html').then(function(text){
-        id = text.split("\n")[0];
-        name = text.split("\n")[1];
-        content = text.split("\n").slice(2).join("\n");
-        default_data.scenes[id] = {
-            name: name,
-            content: content,
-        };
-    }));
-}
 var current_data = null;
 var windows = {};
 
@@ -423,15 +412,32 @@ var load_default = function() {
   load_data(default_data);
 }
 
+var get_absolute_url = function(ref_url, path){
+    var ref_url = (new URL(ref_url, document.location)).href;
+    return (new URL(path, ref_url)).href;
+};
+
 $(function(){
-    Promise.all(loading_promises).then(function(){
-        var temp_current_data_scenes = JSON.parse(localStorage.getItem('current_data'));
-        var temp_data = JSON.parse(JSON.stringify(default_data));
-        if(temp_current_data_scenes != null){
-          temp_data.scenes = temp_current_data_scenes;
+    var loading_promises = [];
+    $.get(scene_config, function(loading_scenes){
+        for (let loading_scene of loading_scenes) {
+            loading_promises.push($.get(get_absolute_url(scene_config, loading_scene.path)).then(function(text){
+                default_data.scenes[loading_scene.id] = {
+                    name: loading_scene.name,
+                    content: text,
+                }
+            }));
         }
-        load_data(temp_data);
-    });
+        Promise.all(loading_promises).then(function(){
+            var temp_current_data_scenes = JSON.parse(localStorage.getItem('current_data'));
+            var temp_data = JSON.parse(JSON.stringify(default_data));
+            if(temp_current_data_scenes != null){
+              temp_data.scenes = temp_current_data_scenes;
+            }
+            load_data(temp_data);
+        });
+    }, 'json');
+        
 });
 
 $('#resize-form [name="preview-user"]').change(function(){
