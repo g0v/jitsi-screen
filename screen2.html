@@ -4,7 +4,7 @@
 <title>揪己家 Jo Jitsi Plus :: 線上揪松 Jothon Online</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
-<link rel="stylesheet" href="assets/styles/all.min.css">
+<link rel="stylesheet" href="assets/styles/fontawesome/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;400;700&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -437,7 +437,7 @@ $(function(){
             load_data(temp_data);
         });
     }, 'json');
-        
+
 });
 
 $('#resize-form [name="preview-user"]').change(function(){
@@ -759,6 +759,10 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     height = current_data.screens[idx].height;*/
     scene_id = current_data.screens[idx].scene_id;
     var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
+    check_resize(win, width, height);
+    init_win_env(win, false, event_listener, idx);
+    win.document.open();
+    win.document.write(current_data.scenes[scene_id].content);
     if (current_data.screens[idx].title) {
         win.document.title = '畫面 ' + current_data.screens[idx].title;
     } else {
@@ -770,10 +774,6 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     };
     $('#screen-choose-body-' + idx + ' .btn-reopen').hide();
     $('#screen-choose-body-' + idx + ' .btn-focus').show();
-    check_resize(win, width, height);
-    init_win_env(win, false, event_listener, idx);
-    win.document.open();
-    win.document.write(current_data.scenes[scene_id].content);
     win.onunload = function(){
         $('#screen-choose-body-' + idx + ' .btn-reopen').show();
         $('#screen-choose-body-' + idx + ' .btn-focus').hide();
