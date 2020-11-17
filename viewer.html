@@ -92,6 +92,11 @@ if (matches) {
     host_id = decodeURIComponent(matches[1]);
 }
 
+viewer_name = localStorage.getItem('viewer-name');
+if (viewer_name) {
+    $('#jitsi-form [name="name"]').val(viewer_name);
+}
+
 const initOptions = {
     disableAudioLevels: false,
 
@@ -129,6 +134,7 @@ $('#jitsi-form').submit(function(e){
         }
         $('#enter-div').hide();
         $('#loading-div').show();
+        localStorage.setItem('viewer-name', $('#jitsi-form [name="name"]').val());
 
         jitsi_domain = matches[1];
         jitsi_room = matches[2].toLowerCase();
