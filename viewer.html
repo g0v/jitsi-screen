@@ -7,7 +7,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<script src="//meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
 <script src="common.js"></script>
 <style>
 #result-iframe {
@@ -102,37 +101,39 @@ $('#jitsi-form').submit(function(e){
 
         jitsi_domain = matches[1];
         jitsi_room = matches[2].toLowerCase();
+        $.getScript('//' + jitsi_domain + '/libs/lib-jitsi-meet.min.js')
+        .done(function(script, textStatus) {
+            JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+            JitsiMeetJS.init(initOptions);
+            const options = {
+                hosts: {
+                    domain: jitsi_domain,
+                    muc: 'conference.' + jitsi_domain,
+                    focus: 'focus.' + jitsi_domain,
+                },
+                bosh: 'wss://' + jitsi_domain + '/xmpp-websocket',
+                websocket: 'wss://' + jitsi_domain + '/xmpp-websocket',
 
-        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
-        JitsiMeetJS.init(initOptions);
-		const options = {
-			hosts: {
-				domain: jitsi_domain,
-				muc: 'conference.' + jitsi_domain,
-				focus: 'focus.' + jitsi_domain,
-			},
-			bosh: 'wss://' + jitsi_domain + '/xmpp-websocket',
-			websocket: 'wss://' + jitsi_domain + '/xmpp-websocket',
+               // The name of client node advertised in XEP-0115 'c' stanza
+                 clientNode: 'http://jitsi.org/jitsimeet'
+            };
+            options.bosh += '?room=' + jitsi_room;
+            options.websocket += '?room=' + jitsi_room;
+            connection = new JitsiMeetJS.JitsiConnection(null, null, options);
+            connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
+            connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('連線失敗'); });
+            JitsiMeetJS.mediaDevices.addEventListener(
+                JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
+            onDeviceListChanged);
 
-		   // The name of client node advertised in XEP-0115 'c' stanza
-             clientNode: 'http://jitsi.org/jitsimeet'
-		};
-        options.bosh += '?room=' + jitsi_room;
-        options.websocket += '?room=' + jitsi_room;
-        connection = new JitsiMeetJS.JitsiConnection(null, null, options);
-        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnected);
-        connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function() { alert('連線失敗'); });
-        JitsiMeetJS.mediaDevices.addEventListener(
-            JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
-        onDeviceListChanged);
-
-    if ($('[name="password"]').val()) {
-        connection.connect({
-            password:$('[name="password"]').val(),
+            if ($('[name="password"]').val()) {
+                connection.connect({
+                    password:$('[name="password"]').val(),
+                });
+            } else {
+                connection.connect();
+            }
         });
-    } else {
-        connection.connect();
-    }
 });
 
 
