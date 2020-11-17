@@ -12,6 +12,15 @@
 #result-iframe {
     width: 100%;
     height: 100%;
+    flex: 1;
+}
+
+#footer {
+  padding: 0 1em;
+  height: 3em;
+  width: 100%;
+  background-color: #DDD;
+  line-height: 3em;
 }
 </style>
 </head>
@@ -25,7 +34,23 @@
     </form>
 </div>
 <div id="loading-div" style="display: none">連線中...</div>
-<iframe id="result-iframe" style="display: none"></iframe>
+<div id="result-box" class="d-none flex-column h-100" style="display: flex;">
+  <div style="flex: 1;">
+    <iframe id="result-iframe"></iframe>
+  </div>
+  <div id="footer" class="d-flex">
+    <div class="mr-4">
+      畫面：
+      <select id="output-video" style="display:none"></select>
+      <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
+    </div>
+    <div class="">
+        聲音：
+        <select id="output-audio" style="display:none"></select>
+        <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
+    </div>
+  </div>
+</div>
 <div id="audio-pool"></div>
 <script>
 var current_data = null;
@@ -395,7 +420,7 @@ var update_content = function(){
     }
     if ($('#loading-div').is(':visible')) {
         $('#loading-div').hide();
-        $('#result-iframe').show();
+        $('#result-box').removeClass("d-none");
     }
     if (hit_scene_id != current_scene_id) {
         current_scene_id = hit_scene_id;
