@@ -306,7 +306,7 @@ var onConnected = function() {
         JitsiMeetJS.events.conference.CONFERENCE_JOINED,
         function(){
             room.on(JitsiMeetJS.events.conference.DATA_CHANNEL_OPENED, () => {
-                room.broadcastEndpointMessage({type: 'request_scene', message: {}});
+                room.broadcastEndpointMessage({type: 'request_scene', host_id: host_id, message: {}});
             });
 
             for (var id in room.participants) {
