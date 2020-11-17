@@ -56,9 +56,15 @@ var get_list_from_content = function(content){
     return list;
 };
 
-var matches = location.search.match(/\?url=(.*)/);
+var matches = location.search.match(/[?&]jitsi_room_url=([^?&]*)/);
 if (matches) {
     $('[name="url"]').val(decodeURIComponent(matches[1]));
+}
+
+var host_id;
+var matches = location.search.match(/[?&]host_id=([^?&]*)/);
+if (matches) {
+    host_id = decodeURIComponent(matches[1]);
 }
 
 const initOptions = {
