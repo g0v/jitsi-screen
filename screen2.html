@@ -211,7 +211,7 @@ label {
       <table class="m-auto">
         <tr>
           <td><label for="login-url" class="form-label">Jisi URL：</label></td>
-          <td class="td-input"><input type="text" name="url" id="login-url" class="form-control" placeholder="請輸入jitsi畫面連結網址..." value="https://jitsi.jothon.online/g0vjothonhelper" required="required"></td>
+          <td class="td-input"><input type="text" name="url" id="login-url" class="form-control" placeholder="請輸入jitsi畫面連結網址..." value="https://meet.jit.si/" required="required"></td>
         </tr>
         <tr>
           <td><label for="login-pw" class="form-label">Password：</label></td>
@@ -415,9 +415,20 @@ var load_default = function() {
 var get_absolute_url = function(ref_url, path){
     var ref_url = (new URL(ref_url, document.location)).href;
     return (new URL(path, ref_url)).href;
-};
+}
+
+var randomString = function(len) {
+　　var $chars = "abcdefghijklmnopqrstuvwxyz1234567890";
+　　var maxPos = $chars.length;
+　　var pwd = "";
+　　for (var i = 0; i < len; i++ ) {
+　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+　　}
+　　return pwd;
+}
 
 $(function(){
+    $("#login-url").attr("value","https://meet.jit.si/"+randomString(10));
     var loading_promises = [];
     $.get(scene_config, function(loading_scenes){
         for (let loading_scene of loading_scenes) {
