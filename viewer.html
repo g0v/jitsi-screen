@@ -170,6 +170,9 @@ $('#jitsi-form').submit(function(e){
 
 var update_screen_video = function(){
     var user_select = {};
+    if (!current_screen_id) {
+        return;
+    }
     if (current_screen_id !== null) {
         user_select = current_data.screens[current_screen_id].user_select;
     }
@@ -365,11 +368,13 @@ var onConnected = function() {
                     for (var idx in windows) {
                         windows[idx].Jitsi.fire('user_left', {id: id, name: user.getDisplayName()});
                     }
+                    update_screen_video();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
                         track.attach($('#audio-' + track.ownerEndpointId)[0]);
                     }
+                    update_screen_video();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
                     if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
