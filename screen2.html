@@ -1470,10 +1470,8 @@ var getHostId = function() {
 
 var onConnected = function() {
     var confOptions = {
-        openBridgeChannel: true,
+        openBridgeChannel: 'websocket',
         confID: jitsi_domain + '/' + jitsi_room,
-        p2p: {enabled: false},
-
     };
 
     $('#logined-area').show();
