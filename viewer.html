@@ -24,7 +24,7 @@
         <button type="submit">Enter</button>
     </form>
 </div>
-<div id="loading-div" style="display: none">Loading...</div>
+<div id="loading-div" style="display: none">連線中...</div>
 <iframe id="result-iframe" style="display: none"></iframe>
 <div id="audio-pool"></div>
 <script>
@@ -290,6 +290,8 @@ var onConnected = function() {
     $('#jitsi-url').text('https://' + jitsi_domain + '/' + jitsi_room);
     update_devices();
 
+    $('#loading-div').text('連線成功，加入房間中...');
+
     room = connection.initJitsiConference(jitsi_room, confOptions);
     room.setDisplayName($('#jitsi-form [name="name"]').val());
     room.on(
@@ -305,6 +307,11 @@ var onConnected = function() {
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_JOINED,
         function(){
+            $('#loading-div').text('加入房間成功，與主持人連絡中...');
+            if (room.getParticipantCount() == 1) {
+                $('#loading-div').text('主持人不在線上，等待主持人加入中...');
+            }
+
             room.on(JitsiMeetJS.events.conference.DATA_CHANNEL_OPENED, () => {
                 room.broadcastEndpointMessage({type: 'request_scene', host_id: host_id, message: {}});
             });
@@ -349,8 +356,6 @@ var onConnected = function() {
             room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
                 if (message.type == 'response_scene') {
-                    $('#loading-div').hide();
-                    $('#result-iframe').show();
                     current_data = message.message.current_data;
                     update_content();
                 } else if (message.type == 'update_scene') {
@@ -387,6 +392,10 @@ var update_content = function(){
         hit_scene_id = 2;
     } else {
         hit_scene_id = hit_screen.scene_id;
+    }
+    if ($('#loading-div').is(':visible')) {
+        $('#loading-div').hide();
+        $('#result-iframe').show();
     }
     if (hit_scene_id != current_scene_id) {
         current_scene_id = hit_scene_id;
