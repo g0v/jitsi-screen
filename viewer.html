@@ -202,10 +202,12 @@ var update_screen_video = function(){
 			if (old_track) {
 				old_track.detach(video_dom[0]);
 			}
-			video_dom.show();
-			track.attach(video_dom[0]);
-			video_dom[0].__track = track;
-			video_dom[0].play();
+            if (track) {
+                video_dom.show();
+                track.attach(video_dom[0]);
+                video_dom[0].__track = track;
+                video_dom[0].play();
+            }
         } else if (user_id.match && user_id.match(/^camera-/)) {
             var device_id = user_id.split('-')[1];
             get_local_video_track(device_id, function(track){
