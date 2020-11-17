@@ -1513,6 +1513,9 @@ var onConnected = function() {
 
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
                     if (message.type == 'request_scene') {
+                        if (message.host_id != getHostId()) {
+                            return;
+                        }
                         if (has_scene_to_response()) {
                             console.log('User ' + participant.getId() + ' requested scenes, responsed');
                             room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data()});
