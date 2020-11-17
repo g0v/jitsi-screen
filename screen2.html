@@ -1480,7 +1480,7 @@ var onConnected = function() {
     var jitsi_room_url = 'https://' + jitsi_domain + '/' + jitsi_room;
     $('#jitsi-url').html(`<a href="${jitsi_room_url}" target="_blank">${jitsi_room_url}</a>`);
     var host_id = getHostId();
-    $('#viewer-url').val((new URL('./viewer.html', document.location)).href + '?host_id=' + host_id);
+    $('#viewer-url').val((new URL('./viewer.html', document.location)).href + '?host_id=' + host_id + '&jitsi_room_url=' + encodeURIComponent(jitsi_room_url));
     $('#logined-area [name="bot-name"]').val($('#jitsi-form [name="bot-name"]').val());
     update_devices();
 
