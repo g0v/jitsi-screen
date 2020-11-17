@@ -491,6 +491,38 @@ function unload() {
 var level_changed = function(participant, audioLevel){
 };
 
+$('#output-video').change(function(e){
+    var id = $(this).val();
+    var promises = [];
+    for (var track of room.getLocalTracks()) {
+        if (track.getType() != 'video') continue;
+        promises.push(room.removeTrack(track));
+        if (track.videoType == 'desktop') {
+            track.dispose();
+        }
+        $(`#user-list-${room.myUserId()} .video-stat`).removeClass('fa-video').addClass('fa-video-slash');
+    }
+
+    Promise.all(promises).then(function(){
+        if ('none' == id) {
+            update_screen_video();
+        } else if ('screenshare' == id) {
+            JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+            .then(function(tracks){
+                room.addTrack(tracks[0]).then(update_screen_video);
+                $(`#user-list-${room.myUserId()} .video-stat`).addClass('fa-video').removeClass('fa-video-slash');
+            })
+            .catch(error => {
+            });
+        } else {
+            get_local_video_track(id, function(track){
+                room.addTrack(track).then(update_screen_video);
+                $(`#user-list-${room.myUserId()} .video-stat`).addClass('fa-video').removeClass('fa-video-slash');
+            });
+        }
+    });
+});
+
 </script>
 </body>
 </html>
