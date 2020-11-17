@@ -111,8 +111,6 @@ label {
   padding: 1px 2px;
 }
 #card-screen-settings .add-viewer-block button {
-  margin: 0;
-  margin-left: 5px;
 }
 #card-screen-settings button {
   margin: 2.5px 5px 2.5px 0;
@@ -682,14 +680,14 @@ $('#form-screen-new').submit(function(e){
   $('[name="width"]', div_dom).val(width);
   $('[name="height"]', div_dom).val(height);
   var user_list = get_list_from_content(current_data.scenes[scene_id].content);
-  $('.custom-box', div_dom).append('觀眾：<span class="viewer-list"></span><div class="add-viewer-block"></div>');
+  $('.custom-box', div_dom).append('<div>推送：<span class="viewer-list"></span><span class="add-viewer-block"></span></div>');
   current_data.screens[idx].viewers.map(function(viewer){
-    $('.viewer-list', div_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+    $('.viewer-list', div_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text("關閉推送"));
   });
-  var viewer_dom = $('<select></select>').addClass('viewer-select');
+  var viewer_dom = $('<select></select>').addClass('viewer-select').addClass('d-none');
   viewer_dom.append($('<option></option>').attr('value', 'default-預設').text('預設'));
   $('.custom-box .add-viewer-block', div_dom).append(viewer_dom);
-  $('.custom-box .add-viewer-block', div_dom).append($('<button class="btn-add-viewer btn btn-dark"><i class="fas fa-plus"></i></button>'));
+  $('.custom-box .add-viewer-block', div_dom).append($('<button class="btn-add-viewer btn btn-dark">推送畫面</button>'));
   user_list.map(function(id){
       $('.custom-box', div_dom).append($('<span></span>').text('User ' + id + '：'));
       $('.custom-box', div_dom).append($('<select></select>').addClass('user-select').addClass('new').data('id', id).addClass('user-select-' + id));
@@ -1046,6 +1044,7 @@ $('#jitsi-form').submit(function(e){
 
 $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     e.preventDefault();
+    $(this).hide();
     var box_dom = $(this).parents('.custom-box');
     var viewer = $('.viewer-select', box_dom).val();
     for (var i = 0; i < $('.btn-delete-viewer', box_dom).length; i ++) {
@@ -1054,7 +1053,7 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
             return;
         }
     }
-    $('.viewer-list', box_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text(viewer.split('-')[1]));
+    $('.viewer-list', box_dom).append($('<button class="btn btn-dark"></button>').addClass('btn-delete-viewer').data('viewer', viewer).text("關閉推送"));
     var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
     if ('undefined' === typeof(screen_id)) {
         return;
@@ -1088,11 +1087,36 @@ var get_scene_data = function(){
             scenes[current_data.screens[screen_id].scene_id] = current_data.scenes[current_data.screens[screen_id].scene_id];
         }
     }
-    return {current_data: {
-        screens: current_data.screens,
-        scenes: scenes,
-        version: current_data.version,
-    }};
+
+    if(Object.keys(scenes).length == 0) { // fake scene
+      return {
+        current_data: {
+          scenes: {
+            "0": {
+              "name": "null scene",
+              "content": `<div style="height: 100%; width: 100%"><h1>暫無畫面</h1></div>`
+            }
+          },
+          screens: [
+            {
+              height: 900,
+              scene_id: "0",
+              title: "",
+              user_select: {},
+              viewers: ["default-預設"],
+              width: 1600
+            }
+          ],
+          version: 0
+        }
+      }
+    }
+    else
+      return {current_data: {
+          screens: current_data.screens,
+          scenes: scenes,
+          version: current_data.version,
+      }};
 };
 
 $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
@@ -1101,6 +1125,7 @@ $('#screen-choose-body-area').on('click', '.btn-delete-viewer', function(e){
     var screen_id = $(this).parents('.screen-choose-body').data('screen_id');
     var deleting_viewer = $(this).data('viewer');
     $(this).remove();
+    $(".btn-add-viewer").show();
     if ('undefined' === typeof(screen_id)) {
         return;
     }
@@ -1457,6 +1482,7 @@ var update_devices = function(tracks) {
 };
 
 var has_scene_to_response = function() {
+    return true;
     if (current_data.screens.length == 0) {
         return false;
     }
