@@ -203,7 +203,7 @@ label {
 <div class="flex-column" id="section-login" style="display: flex; height: 100vh;">
   <a href="https://github.com/g0v/jitsi-screen" target="_blank" style="position: fixed; z-index: 99999999; right: 0;"><img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
   <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">揪己家 Jo Jitsi Plus</a>
+    <a class="navbar-brand" href="/screen2.html">揪己家 Jo Jitsi Plus</a>
   </nav>
   <div class="d-flex sections-contents justify-content-center text-center">
     <form class="align-self-center" method="post" id="jitsi-form">
@@ -229,7 +229,7 @@ label {
 <div class="d-none" id="section-main">
   <nav class="navbar navbar-dark bg-dark" id="main-header">
     <button class="btn btn-secondary mr-4" id="main-card-left-toggler"><i class="fas fa-sliders-h"></i></button>
-    <a class="navbar-brand" href="#">揪己家 Jo Jitsi Plus</a>
+    <a class="navbar-brand" href="/screen2.html">揪己家 Jo Jitsi Plus</a>
     <ul class="navbar-nav ml-auto">
       <a class="bot-name" style="border-right: 2px solid; padding-right: 1rem; color: #DDD;"></a>
     </ul>
@@ -244,15 +244,17 @@ label {
             <div>
                 畫面：
                 <select id="output-video" style="display:none"></select>
-                <button id="btn-access-video">同意使用攝影機</button>
+                <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
             </div>
             <div>
                 聲音：
                 <select id="output-audio" style="display:none"></select>
-                <button id="btn-access-audio">同意使用麥克風</button>
+                <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
             </div>
             Jitsi URL: <span id="jitsi-url"></span><br>
-            Viewer URL: <input type="text" readonly="readonly" id="viewer-url"></span><br>
+            Viewer URL:
+            <input type="text" readonly="readonly" id="viewer-url" style=""><button id="viewer-url-copy" style="position: relative; margin-left: -4em; width: 4em; bottom: 3px;" class="btn btn-dark btn-sm">複製</button>
+
     		Bot Name: <input type="text" name="bot-name" value=""><br>
         </div>
       </div>
@@ -307,18 +309,17 @@ label {
             <span class="px-1">x</span>
             <input type="text" name="height" value="900" size="5">
             <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
-            <span>｜</span>
-            <label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;">
+            <div style="display: none"><span>｜</span><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;"></div>
           </form>
       </div>
     </div>
     <div class="card main-card-right" id="card-scene-choose">
       <div class="card-header text-light bg-secondary">
     	  場景列表｜
-        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增場景</button>
-        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-import"><i class="fas fa-sign-in-alt"></i> 匯入場景</button>
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增空白場景</button>
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-import"><i class="fas fa-sign-in-alt"></i> 匯入</button>
         <input type="file" name="scene_file" id="scene-file-input" accept=".json" style="display: none;"/>
-        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-export"><i class="fas fa-sign-out-alt"></i> 匯出場景</button>
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-export"><i class="fas fa-sign-out-alt"></i> 匯出</button>
       </div>
       <div class="card-body">
     	<ol id="scene-list"></ol>
@@ -402,7 +403,7 @@ var load_data = function(data){
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
 		var scene = current_data.scenes[scene_id];
     $(".scene-list-title",li_dom).text(scene.name);
-		$("div",li_dom).append($('<button></button>').text('場景預覽').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', scene_id);
 		$('#scene-list').append(li_dom);
@@ -738,6 +739,14 @@ $('#form-screen-new').submit(function(e){
   // XXX
 });
 
+$('#viewer-url-copy').on('click', function() {
+  var copyText = document.getElementById("viewer-url");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+  alert("已複製觀眾網址");
+});
+
 $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
@@ -824,7 +833,7 @@ $('#btn-scene-choose-add').click(function(e){
     current_data.scenes[new_id] = scenes_new;
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
     $(".scene-list-title",li_dom).text(scenes_new.name);
-		$("div",li_dom).append($('<button></button>').text('場景預覽').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', new_id);
 		$('#scene-list').append(li_dom);
