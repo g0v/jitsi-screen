@@ -252,6 +252,7 @@ label {
                 <button id="btn-access-audio">同意使用麥克風</button>
             </div>
             Jitsi URL: <span id="jitsi-url"></span><br>
+            Viewer URL: <input type="text" readonly="readonly" id="viewer-url"></span><br>
     		Bot Name: <input type="text" name="bot-name" value=""><br>
         </div>
       </div>
@@ -1458,6 +1459,15 @@ var has_scene_to_response = function() {
     return false;
 };
 
+var getHostId = function() {
+    var host_id = localStorage.getItem('host_id');
+    if (!host_id) {
+        host_id = Math.floor(Math.random() * 100000000);
+        localStorage.setItem('host_id', host_id);
+    }
+    return host_id;
+};
+
 var onConnected = function() {
     var confOptions = {
         openBridgeChannel: true,
@@ -1469,6 +1479,8 @@ var onConnected = function() {
     $('#logined-area').show();
     var jitsi_room_url = 'https://' + jitsi_domain + '/' + jitsi_room;
     $('#jitsi-url').html(`<a href="${jitsi_room_url}" target="_blank">${jitsi_room_url}</a>`);
+    var host_id = getHostId();
+    $('#viewer-url').val((new URL('./viewer.html', document.location)).href + '?host_id=' + host_id);
     $('#logined-area [name="bot-name"]').val($('#jitsi-form [name="bot-name"]').val());
     update_devices();
 
