@@ -27,10 +27,10 @@
 <body>
 <div id="enter-div">
     <form id="jitsi-form">
-        Jitsi URL: <input type="text" name="url"><br>
-        Password: <input type="password" name="password"><br>
-        Your name: <input type="text" name="name"><br>
-        <button type="submit">Enter</button>
+      Jitsi URL: <input type="text" name="url" required><br>
+      Password: <input type="password" name="password"><br>
+      Your name: <input type="text" name="name" required><br>
+      <button type="submit">Enter</button>
     </form>
 </div>
 <div id="loading-div" style="display: none">連線中...</div>
@@ -313,6 +313,24 @@ var update_devices = function(tracks) {
         });
     }
 };
+
+
+$('#btn-access-video').click(function(e){
+    e.preventDefault();
+    JitsiMeetJS.createLocalTracks({ devices: [ 'video' ] })
+    .then(update_devices)
+    .catch(error => {
+        throw error;
+    });
+});
+$('#btn-access-audio').click(function(e){
+    e.preventDefault();
+    JitsiMeetJS.createLocalTracks({ devices: [ 'audio' ] })
+    .then(update_devices)
+    .catch(error => {
+        throw error;
+    });
+});
 
 var onConnected = function() {
     var confOptions = {

@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>揪己家 Jo Jitsi Plus :: 線上揪松 Jothon Online</title>
-<base href="https://g0v.github.io/jitsi-screen/">
+<!--base href="https://g0v.github.io/jitsi-screen/"-->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
 <link rel="stylesheet" href="assets/styles/fontawesome/css/all.min.css">
@@ -202,7 +202,7 @@ label {
 <div class="flex-column" id="section-login" style="display: flex; height: 100vh;">
   <a href="https://github.com/g0v/jitsi-screen" target="_blank" style="position: fixed; z-index: 99999999; right: 0;"><img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
   <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="screen2.html">揪己家 Jo Jitsi Plus</a>
+    <a class="navbar-brand" href="/jitsi-screen/screen2.html">揪己家 Jo Jitsi Plus</a>
     <div class="mr-auto">
       <a href="#" role="button" class="btn btn-outline-light" data-toggle="modal" data-target="#briefModal">關於揪己家</a>
     </div>
@@ -249,7 +249,7 @@ label {
 <div class="d-none" id="section-main">
   <nav class="navbar navbar-dark bg-dark" id="main-header">
     <button class="btn btn-secondary mr-4" id="main-card-left-toggler"><i class="fas fa-sliders-h"></i></button>
-    <a class="navbar-brand" href="screen2.html">揪己家 Jo Jitsi Plus</a>
+    <a class="navbar-brand" href="/jitsi-screen/screen2.html">揪己家 Jo Jitsi Plus</a>
     <ul class="navbar-nav ml-auto">
       <a class="bot-name" style="border-right: 2px solid; padding-right: 1rem; color: #DDD;"></a>
     </ul>
@@ -1066,6 +1066,7 @@ $('#jitsi-form').submit(function(e){
 
 $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     e.preventDefault();
+    $('.btn-add-viewer').show();
     $(this).hide();
     var box_dom = $(this).parents('.custom-box');
     var viewer = $('.viewer-select', box_dom).val();
