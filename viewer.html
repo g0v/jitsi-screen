@@ -64,7 +64,7 @@
 </div>
 <div id="audio-pool"></div>
 <script>
-var current_data = null;
+var current_data = {'version': -1};
 var windows = {};
 
 var check_resize = function(win, width, height){
@@ -451,7 +451,6 @@ var onConnected = function() {
         room.join();
     }
 }
-var current_data = {"version": 0};
 var current_screen_id;
 
 var update_content = function(){
