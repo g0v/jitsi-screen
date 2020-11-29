@@ -16,11 +16,19 @@
 }
 
 #footer {
+  display: flex;
   padding: 0 1em;
   height: 3em;
   width: 100%;
   background-color: #DDD;
   line-height: 3em;
+}
+
+#toggle-footer {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  z-index: 9999999;
 }
 </style>
 </head>
@@ -38,7 +46,7 @@
   <div style="flex: 1;">
     <iframe id="result-iframe"></iframe>
   </div>
-  <div id="footer" class="d-flex">
+  <div id="footer" class="d-none">
     <div class="mr-4">
       畫面：
       <select id="output-video" style="display:none"></select>
@@ -50,6 +58,9 @@
         <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
     </div>
   </div>
+  <button id="toggle-footer">
+    footer 開/關
+  </button>
 </div>
 <div id="audio-pool"></div>
 <script>
@@ -124,6 +135,15 @@ var connection;
 var onDeviceListChanged = function(devices) {
     update_devices();
 };
+
+$('#toggle-footer').on('click', function(e) {
+  if($('#footer').hasClass("d-none")) {
+    $('#footer').removeClass("d-none");
+  }
+  else {
+    $('#footer').addClass("d-none");
+  }
+});
 
 $('#jitsi-form').submit(function(e){
         e.preventDefault();
@@ -412,11 +432,15 @@ var onConnected = function() {
             room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
                 if (message.type == 'response_scene') {
+                  if (message.message.current_data.version != current_data.version) {
                     current_data = message.message.current_data;
                     update_content();
+                  }
                 } else if (message.type == 'update_scene') {
+                  if (message.message.current_data.version != current_data.version) {
                     current_data = message.message.current_data;
                     update_content();
+                  }
                 }
             });
         });
@@ -427,39 +451,44 @@ var onConnected = function() {
         room.join();
     }
 }
-var current_data;
-var current_scene_id;
+var current_data = {"version": 0};
 var current_screen_id;
 
 var update_content = function(){
     var hit_screen = null;
-    var hit_scene_id = null;
-    current_screen_id = null;
+    var hit_screen_id = null;
     for (var screen_id in current_data.screens) {
         screen = current_data.screens[screen_id];
         var viewers = screen.viewers.map(function(a) { return a.split('-')[0]; });
         if (viewers.indexOf('default') >= 0) {
-            current_screen_id = screen_id;
+            console.log("index: "+viewers.indexOf('default'));
+            console.log("hit_screen_id: "+screen_id);
+            hit_screen_id = screen_id;
             hit_screen = screen;
             break;
         }
-    }
-    if (hit_screen === null) {
-        hit_scene_id = 2;
-    } else {
-        hit_scene_id = hit_screen.scene_id;
     }
     if ($('#loading-div').is(':visible')) {
         $('#loading-div').hide();
         $('#result-box').removeClass("d-none");
     }
-    if (hit_scene_id != current_scene_id) {
-        current_scene_id = hit_scene_id;
+    if(current_data.screens.length == 0) {
+      console.log("NULL SCENE");
+      current_screen_id = null;
+      init_win_env($('#result-iframe')[0].contentWindow, false);
+      var content = `<div style="height: 100%; width: 100%"><h1>暫無畫面</h1></div>`;
+      $('#result-iframe')[0].contentDocument.open();
+      $('#result-iframe')[0].contentDocument.write(content);
+      return;
+    }
+    if (hit_screen_id != current_screen_id) {
+        current_screen_id = hit_screen_id;
         init_win_env($('#result-iframe')[0].contentWindow, false);
-        var content = current_data.scenes[current_scene_id].content;
+        var content = hit_screen.content;
 
         $('#result-iframe')[0].contentDocument.open();
         $('#result-iframe')[0].contentDocument.write(content);
+        $('#result-iframe').contents().find('html').css('overflow', 'hidden');
     }
     update_screen_video();
 };

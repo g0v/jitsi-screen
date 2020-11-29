@@ -298,7 +298,7 @@ label {
     		<!--form id="form-scene-editor">
     			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
     				<div class="input-group-prepend">
-    					<span class="input-group-text" id="inputGroup-sizing-sm">場景名稱</span>
+    					<span class="input-group-text" id="inputGroup-sizing-sm">場景模板</span>
     				</div>
     				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
     			</div>
@@ -313,7 +313,7 @@ label {
       <div class="card-body">
         <div id="preview-html" class="d-none">
           <div class="p-2">
-            <label for="scene-title">場景名稱</label><input type="text" name=scene-title maxlength="12">
+            <label for="scene-title">場景模板</label><input type="text" name=scene-title maxlength="12">
             <button class="btn btn-secondary btn-sm ml-4" type="button" id="btn-editor-add-video">添加視訊</button>
           </div>
           <textarea class="container-fluid">
@@ -348,7 +348,6 @@ label {
     <div class="card main-card-right" id="card-screen-list">
       <div class="card-header text-light bg-secondary">
     	  畫面選擇列表
-    	  <button class="btn btn-dark btn-sm" type="button" id="btn-screen-choose-add"><i class="fas fa-plus"></i> 新增畫面</button>
       </div>
       <div class="card-body">
         <div id="screen-list-div">
@@ -386,7 +385,7 @@ label {
                     <button class="btn-reopen btn btn-dark">重新開啟</button>
                     <button class="btn-reupdate btn btn-dark">重新繪製</button>
                 <br>
-                  場景名稱：<span class="scene-chooser"></span><br>
+                  場景模板：<span class="scene-chooser"></span><br>
                   畫面標題：<span class="screen-title"></span><br>
                   尺寸(本機)：<br>
                   <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
@@ -569,6 +568,10 @@ var update_preview_video = function(){
 var update_preview_content = function(content){
   //editor.setData(content);
   scene_id = $("#preview-iframe").data('scene_id');
+  screen_id = $("#preview-iframe").data('screen_id');
+  if(scene_id == undefined) {
+    scene_id = current_data.screens[screen_id].scene_id;
+  }
   $("#preview-html textarea").val(content);
   $("#preview-html [name='scene-title']").val(current_data.scenes[scene_id].name);
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
@@ -588,13 +591,21 @@ var update_preview_content = function(content){
 
 $('#btn-scene-editor-save').click(function(e){
     scene_id = $("#preview-iframe").data('scene_id');
-    var title = $("#preview-html [name='scene-title']").val();
-    var content = $('#preview-html textarea').val();
-    current_data.scenes[scene_id].name = title;
-    current_data.scenes[scene_id].content = content;
-    $("#card-scene-preview .card-header span").text("｜"+ title);
-    $($('a.scene-list-title')[scene_id-1]).text(title);
-    localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
+    screen_id = $("#preview-iframe").data('screen_id');
+    console.log("screen_id: "+screen_id+" scene_id: "+scene_id);
+    if(scene_id != undefined) {
+      var title = $("#preview-html [name='scene-title']").val();
+      var content = $('#preview-html textarea').val();
+      current_data.scenes[scene_id].name = title;
+      current_data.scenes[scene_id].content = content;
+      $("#card-scene-preview .card-header span").text("｜"+ title);
+      $($('a.scene-list-title')[scene_id-1]).text(title);
+      localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
+    }
+    else {
+      var content = $('#preview-html textarea').val();
+      current_data.screens[screen_id].content = content;
+    }
 });
 
 var event_listener = function(event, screen_id, values){
@@ -682,7 +693,8 @@ $('#form-screen-new').submit(function(e){
   var width = parseInt($('#resize-form [name="width"]').val());
   var height = parseInt($('#resize-form [name="height"]').val());
   var user_select = {};
-
+  var content = current_data.scenes[scene_id].content;
+  var name = current_data.scenes[scene_id].name;
   $('#form-screen-new .user-select').each(function(){
       user_select[$(this).data('id')] = $(this).val();
   });
@@ -691,8 +703,10 @@ $('#form-screen-new').submit(function(e){
   current_data.screens.push({
       scene_id: scene_id,
       title: title,
+      name: name,
       width: width,
       height: height,
+      content: content,
       viewers: $('#form-screen-new .btn-delete-viewer').map(function(a){ return $(this).data('viewer'); }).toArray(),
       user_select: user_select,
   });
@@ -918,13 +932,20 @@ $('#screen-list').on('click', '.screen-item', function(e){
     $(this).addClass('active');
 
     var scene_id = $('#screen-choose-body-' + idx).data('scene_id');
-    var scene = current_data.scenes[scene_id];
-    $("#preview-iframe").data('scene_id', scene_id);
+    var scene = current_data.screens[idx];
+    $("#preview-iframe").removeData('scene_id');
+    $("#preview-iframe").data('screen_id', idx);
     update_preview_content(scene.content);
 });
 
 $('#scene-list').on('click', '.btn-preview', function(e){
 	e.preventDefault();
+
+  $('#screen-choose-body-area .screen-choose-body').hide();
+  $('.screen-item').removeClass('active');
+  $('#card-screen-settings .card-header span').text("新增畫面");
+  $('#screen-choose-body-new').show();
+
   var scene_id = $(this).parents('li').data('id');
   var scene = current_data.scenes[scene_id];
   $("#preview-iframe").data('scene_id', scene_id);
@@ -1115,20 +1136,8 @@ var get_scene_data = function(){
       return {
         current_data: {
           scenes: {
-            "0": {
-              "name": "null scene",
-              "content": `<div style="height: 100%; width: 100%"><h1>暫無畫面</h1></div>`
-            }
           },
           screens: [
-            {
-              height: 900,
-              scene_id: "0",
-              title: "",
-              user_select: {},
-              viewers: ["default-預設"],
-              width: 1600
-            }
           ],
           version: 0
         }
