@@ -1363,12 +1363,12 @@ var update_user_list = function(){
         option_dom.html('不顯示').val('none');
         $(this).append(option_dom);
 
-
+        /*
         for (var device of device_list.video) {
             var option_dom = $('<option></option>');
             option_dom.html('Camera ' + device.label).val('camera-' + device.deviceId);
             $(this).append(option_dom);
-        }
+        }*/
 
         option_dom = $('<option></option>');
         option_dom.text('viewer').val('viewer');
