@@ -735,9 +735,10 @@ $('#form-screen-new').submit(function(e){
   $('#screen-choose-body-area').append(div_dom);
   $('#card-screen-settings .card-header span').text('畫面 ' + idx + ' ' + title);
   update_user_list();
+
   user_list.map(function(id){
-      $('.user-select-' + id).each(function(){
-          $(this).val($('#form-screen-new [name="user-select[' + id + ']"]').val());
+      $('.user-select-' + id, div_dom).each(function(){
+          $(this).val('none');
       });
   });
 
