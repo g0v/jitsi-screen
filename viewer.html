@@ -26,9 +26,22 @@
 
 #toggle-footer {
   position: fixed;
-  bottom: 1em;
-  right: 1em;
+  bottom: 0;
+  left: calc(50% - 16px);
+  background-color: rgba(0,0,0,0.3);
+  padding: 8px 16px;
   z-index: 9999999;
+  border-radius: 8px 8px 0 0;
+}
+
+.arrow {
+  transition: .3s;
+  border: solid white;
+  border-width: 0 8px 8px 0;
+  display: inline-block;
+  padding: 8px;
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
 }
 </style>
 </head>
@@ -58,9 +71,9 @@
         <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
     </div>
   </div>
-  <button id="toggle-footer">
-    footer 開/關
-  </button>
+  <div id="toggle-footer">
+    <i class="arrow"></i>
+  </div>
 </div>
 <div id="audio-pool"></div>
 <script>
@@ -139,9 +152,11 @@ var onDeviceListChanged = function(devices) {
 $('#toggle-footer').on('click', function(e) {
   if($('#footer').hasClass("d-none")) {
     $('#footer').removeClass("d-none");
+    $('.arrow').css({'transform': 'rotate(45deg)','-webkit-transform': 'rotate(45deg)'});
   }
   else {
     $('#footer').addClass("d-none");
+    $('.arrow').css({'transform': 'rotate(-135deg)','-webkit-transform': 'rotate(-135deg)'});
   }
 });
 
