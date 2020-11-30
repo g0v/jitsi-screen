@@ -701,6 +701,10 @@ $('#form-screen-new').submit(function(e){
   });
 
   var idx = current_data.screens.length;
+
+  $("#preview-iframe").removeData('scene_id');
+  $("#preview-iframe").data('screen_id', idx);
+
   current_data.screens.push({
       scene_id: scene_id,
       title: title,
@@ -792,6 +796,8 @@ $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
 $('#screen-choose-body-area').on('click', '.btn-reupdate', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
+    windows[idx].document.body.innerHTML = '';
+    windows[idx].document.write(current_data.screens[idx].content);
     windows[idx].Jitsi.reload();
 });
 
@@ -819,7 +825,7 @@ $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
     check_resize(win, width, height);
     init_win_env(win, false, event_listener, idx);
     win.document.open();
-    win.document.write(current_data.scenes[scene_id].content);
+    win.document.write(current_data.screens[idx].content);
     if (current_data.screens[idx].title) {
         win.document.title = '畫面 ' + current_data.screens[idx].title;
     } else {
