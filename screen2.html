@@ -1264,6 +1264,7 @@ var update_screen_video = function(){
             }
             var video_dom = $('video', this);
             var audio_dom = $('audio', this);
+            var user_name = "none";
             $(this).attr('data-result-user', user_id);
             if ('undefined' === typeof(user_id) || user_id == 'none') {
                 var old_track = video_dom[0].__track;
@@ -1271,6 +1272,7 @@ var update_screen_video = function(){
                     video_detach(this, old_track);
                 }
             } else if (user_id == 'viewer') {
+                user_name = "{viewer_name}";
                 var track = room.getLocalVideoTrack();
                 var old_track = video_dom[0].__track;
                 if (old_track) {
@@ -1291,12 +1293,14 @@ var update_screen_video = function(){
             } else {
                 var audio_track = null;
                 if (user_id == room.myUserId()) {
+                    user_name = room.myName;
                     var track = room.getLocalVideoTrack();
                     var tracks = [];
                     if ('undefined' !== typeof(track)) {
                         tracks.push(track);
                     }
                 } else if ('undefined' !== typeof(room.participants[user_id])) {
+                    user_name = room.participants[user_id].getDisplayName();
                     var tracks = room.participants[user_id].getTracksByMediaType('video');
                     audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
                     if ($(this).is('.audio-mute')) {
@@ -1338,6 +1342,7 @@ var update_screen_video = function(){
                     $('audio', this)[0].play();
                 }
             }
+            $('username',$(this)).text(user_name);
         });
         win.Jitsi.fire('user_box_updated', {});
     }
@@ -1559,7 +1564,7 @@ var getHostId = function() {
 var onConnected = function() {
     var confOptions = {
         openBridgeChannel: 'websocket',
-        confID: jitsi_domain + '/' + jitsi_room,
+        confID: jitsi_domain + '/' + jitsi_room
     };
 
     $('#logined-area').show();

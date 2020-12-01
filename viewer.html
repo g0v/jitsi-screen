@@ -209,7 +209,14 @@ $('#jitsi-form').submit(function(e){
 });
 
 
-var update_screen_video = function(){
+var update_screen_video = function() {
+
+    for (var id in selected_users) {
+        if (selected_users[id] == 'select') {
+            delete(selected_users[id]);
+        }
+    }
+
     var user_select = {};
     if (!current_screen_id) {
         return;
@@ -219,77 +226,85 @@ var update_screen_video = function(){
     }
     win = $('#result-iframe')[0].contentWindow;
     $('.video-box', win.document).each(function(){
-        var data_id = $(this).data('id');
-        user_id = user_select[$(this).attr('data-id')];
-        if ('undefined' === typeof(user_id)) {
-            user_id = $(this).attr('data-user');
-        }
-        if ('undefined' === typeof(user_id)) {
-            return;
-        }
-        if (!$('video', this).length) {
-            $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
-        }
-        var video_dom = $('video', this);
-        if (user_id == 'none') {
-            var old_track = video_dom[0].__track;
-            if (old_track) {
-                old_track.detach(video_dom[0]);
-            }
-            video_dom.hide();
-		} else if (user_id == 'viewer') {
-			var track = room.getLocalVideoTrack();
-			var old_track = video_dom[0].__track;
-			if (old_track) {
-				old_track.detach(video_dom[0]);
-			}
-            if (track) {
-                video_dom.show();
-                track.attach(video_dom[0]);
-                video_dom[0].__track = track;
-                video_dom[0].play();
-            }
-        } else if (user_id.match && user_id.match(/^camera-/)) {
-            var device_id = user_id.split('-')[1];
-            get_local_video_track(device_id, function(track){
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    old_track.detach(video_dom[0]);
-                }
-                video_dom.show();
-                track.attach(video_dom[0]);
-                video_dom[0].__track = track;
-                video_dom[0].play();
-            });
-        } else {
-            if (user_id == room.myUserId()) {
-                var track = room.getLocalVideoTrack();
-                var tracks = [];
-                if ('undefined' !== typeof(track)) {
-                    tracks.push(track);
-                }
-            } else if ('undefined' !== typeof(room.participants[user_id])) {
-                var tracks = room.participants[user_id].getTracksByMediaType('video');
-            } else {
-                return;
-            }
+      var data_id = $(this).data('id');
+      user_id = user_select[$(this).attr('data-id')];
+      if ('undefined' === typeof(user_id)) {
+          user_id = $(this).attr('data-user');
+      }
+      if ('undefined' === typeof(user_id)) {
+          return;
+      }
+      if (!$('video', this).length) {
+          $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0" autoplay="1" muted></video>'));
+      }
 
-            var old_track = video_dom[0].__track;
-            if (old_track) {
-                old_track.detach(video_dom[0]);
-            }
+      var video_dom = $('video', this);
+      var user_name = "none";
+      if (user_id == 'none') {
+        var old_track = video_dom[0].__track;
+        if (old_track) {
+            old_track.detach(video_dom[0]);
+        }
+        video_dom.hide();
+  		} else if (user_id == 'viewer') {
+        user_name = viewer_name;
+  			var track = room.getLocalVideoTrack();
+  			var old_track = video_dom[0].__track;
+  			if (old_track) {
+  				old_track.detach(video_dom[0]);
+  			}
+        if (track) {
             video_dom.show();
-            if (tracks.length) {
-                tracks[0].attach(video_dom[0]);
-                if ($(this).data('select') == 'true') {
-                    room.selectParticipant(user_id);
-                }
-
-                video_dom[0].__track = tracks[0];
-                video_dom[0].play();
-            }
+            track.attach(video_dom[0]);
+            video_dom[0].__track = track;
+            video_dom[0].play();
         }
+      } else if (user_id.match && user_id.match(/^camera-/)) {
+          var device_id = user_id.split('-')[1];
+          get_local_video_track(device_id, function(track){
+              var old_track = video_dom[0].__track;
+              if (old_track) {
+                  old_track.detach(video_dom[0]);
+              }
+              video_dom.show();
+              track.attach(video_dom[0]);
+              video_dom[0].__track = track;
+              video_dom[0].play();
+          });
+      } else {
+          if (user_id == room.myUserId()) {
+              user_name = viewer_name;
+              var track = room.getLocalVideoTrack();
+              var tracks = [];
+              if ('undefined' !== typeof(track)) {
+                  tracks.push(track);
+              }
+          } else if ('undefined' !== typeof(room.participants[user_id])) {
+              user_name = room.participants[user_id].getDisplayName();
+              var tracks = room.participants[user_id].getTracksByMediaType('video');
+          } else {
+              return;
+          }
+
+          var old_track = video_dom[0].__track;
+          if (old_track) {
+              old_track.detach(video_dom[0]);
+          }
+          video_dom.show();
+          if (tracks.length) {
+              tracks[0].attach(video_dom[0]);
+              if ($(this).attr('data-select') == 'true') {
+                selected_users[user_id] = 'select';
+                room.selectParticipant(user_id);
+              }
+
+              video_dom[0].__track = tracks[0];
+              video_dom[0].play();
+          }
+      }
+      $('username',$(this)).text(user_name);
     });
+    reselected_users();
 };
 
 var room;
@@ -370,10 +385,7 @@ $('#btn-access-audio').click(function(e){
 var onConnected = function() {
     var confOptions = {
         openBridgeChannel: 'websocket',
-        confID: jitsi_domain + '/' + jitsi_room,
-        capScreenshareBitrate: true,
-        disableRtx: false,
-        enableLayerSuspension: false,
+        confID: jitsi_domain + '/' + jitsi_room
     };
 
     $('#jitsi-url').text('https://' + jitsi_domain + '/' + jitsi_room);
@@ -382,6 +394,7 @@ var onConnected = function() {
     $('#loading-div').text('連線成功，加入房間中...');
 
     room = connection.initJitsiConference(jitsi_room, confOptions);
+    room.myName = $('#jitsi-form [name="bot-name"]').val();
     room.setDisplayName($('#jitsi-form [name="name"]').val());
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_FAILED,
@@ -416,6 +429,23 @@ var onConnected = function() {
                     audio_track.attach(audio_dom[0]);
                 }
             }
+
+            room.on(JitsiMeetJS.events.conference.PARTICIPANT_CONN_STATUS_CHANGED, (id, status) => {
+                    if (status == 'inactive' && 'undefined' === typeof(selected_users[id])) {
+                        var attach_count = 0;
+                        for (var track of room.participants[id].getTracksByMediaType('video')) {
+                            attach_count += track.containers.length;
+                        }
+                        if (attach_count) {
+                            selected_users[id] = 'restoring';
+                            reselected_users();
+                        }
+                    } else if (status == 'active' && 'restoring' === selected_users[id]) {
+                        delete(selected_users[id]);
+                        reselected_users();
+                    }
+            });
+
             room.on(JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
                     if (!$(`#audio-${id}`).length) {
                         var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
