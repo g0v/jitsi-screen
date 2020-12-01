@@ -438,6 +438,20 @@ var get_absolute_url = function(ref_url, path){
     return (new URL(path, ref_url)).href;
 }
 
+var randomString = function() {
+  var taglist = ["Congress","Media","ChildrenandChildren","g0v","GovernmentProcurement","Population","Politics","Welfare","Election","Education","Labor","Ecology","Law","Architecture","Transportation","Energy","DemocraticParticipation","Finance","Knowledge","Language",
+"Land","Map","Agenda","Contacts","Animals","Environment","PublicWelfare","Visualization","Art","Agriculture","Life","CivilService","Record","Community","News","Supervision",
+"LeftFood","Hackathon","Urban","Economy","History","NPO","Tools","OpenCulture","Translation","LandAdministration","OpenInformation","Sharing","Database","Text","Policy",
+"Disaster","Game","Statistics","Gender","Text","Medical","TransitionalJustice","FactCheck","IndigenousPeople","OpenGovernment","Parliament","Birth","Psychology","Labor","China","Meteorology","Residence","Homelessness","Health","CitizenParticipation",
+"GenderEquality","Blockchain","OpenSource","SocialMedia","InformationWar","Summit","CommonLand","lab","EmptyPollution","PictureBook","HealthCare","PublicOpinion","Society","Earthquake","NewResidents","Corrections","UrbanPlanning","Backup","HumanRights",
+"Corruption","AI","Industry","Referendum","voting","epidemic"];
+  var str = "";
+  for (var i=0; i<3; i++) {
+    str += taglist[Math.floor(Math.random() * taglist.length)];
+  }
+  return str;
+}
+/*
 var randomString = function(len) {
 　　var $chars = "abcdefghijklmnopqrstuvwxyz1234567890";
 　　var maxPos = $chars.length;
@@ -446,7 +460,7 @@ var randomString = function(len) {
 　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
 　　}
 　　return pwd;
-}
+}*/
 
 $(function(){
     $("#login-url").attr("value","https://meet.jit.si/"+randomString(10));
