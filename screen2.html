@@ -221,7 +221,7 @@ label {
         </tr>
         <tr>
           <td><label for="login-name" class="form-label">Bot Name：</label></td>
-          <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control" placeholder="請輸入管理員名稱..." value="Jothon Helper" required="required"></td>
+          <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control" placeholder="請輸入管理員名稱..." value="Jo Jitsi Plus" required="required"></td>
         </tr>
       </table>
       <button type="submit" class="btn btn-lg btn-dark px-4 m-4">開始使用</button>
@@ -298,7 +298,7 @@ label {
     		<!--form id="form-scene-editor">
     			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
     				<div class="input-group-prepend">
-    					<span class="input-group-text" id="inputGroup-sizing-sm">場景模板</span>
+    					<span class="input-group-text" id="inputGroup-sizing-sm">模板</span>
     				</div>
     				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
     			</div>
@@ -313,7 +313,7 @@ label {
       <div class="card-body">
         <div id="preview-html" class="d-none">
           <div class="p-2">
-            <label for="scene-title">場景模板</label><input type="text" name=scene-title maxlength="12">
+            <label for="scene-title">畫面模板</label><input type="text" name=scene-title maxlength="12">
             <button class="btn btn-secondary btn-sm ml-4" type="button" id="btn-editor-add-video">添加視訊</button>
           </div>
           <textarea class="container-fluid">
@@ -335,8 +335,8 @@ label {
     </div>
     <div class="card main-card-right" id="card-scene-choose">
       <div class="card-header text-light bg-secondary">
-    	  場景列表｜
-        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增空白場景</button>
+    	  模板列表｜
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增空白模板</button>
         <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-import"><i class="fas fa-sign-in-alt"></i> 匯入</button>
         <input type="file" name="scene_file" id="scene-file-input" accept=".json" style="display: none;"/>
         <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-export"><i class="fas fa-sign-out-alt"></i> 匯出</button>
@@ -369,7 +369,7 @@ label {
       <div id="screen-choose-body-area">
         <div class="screen-choose-body" id="screen-choose-body-new">
             <form class="m-0" id="form-screen-new">
-              <!--label for="scene-chooser">選擇場景</label><select id="scene-chooser" name="scene-chooser"></select><br-->
+              <!--label for="scene-chooser">選擇模板</label><select id="scene-chooser" name="scene-chooser"></select><br-->
               <label for="title">畫面標題</label><input type="text" placeholder="可不輸入" name="title"><br>
               <!--尺寸(本機)：<br>
               <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
@@ -385,7 +385,7 @@ label {
                     <button class="btn-reopen btn btn-dark">重新開啟</button>
                     <button class="btn-reupdate btn btn-dark">重新繪製</button>
                 <br>
-                  場景模板：<span class="scene-chooser"></span><br>
+                  畫面模板：<span class="scene-chooser"></span><br>
                   畫面標題：<span class="screen-title"></span><br>
                   尺寸(本機)：<br>
                   <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
@@ -422,7 +422,7 @@ var load_data = function(data){
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
 		var scene = current_data.scenes[scene_id];
     $(".scene-list-title",li_dom).text(scene.name);
-		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇模板').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', scene_id);
 		$('#scene-list').append(li_dom);
@@ -889,7 +889,7 @@ $('#btn-scene-choose-add').click(function(e){
     current_data.scenes[new_id] = scenes_new;
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
     $(".scene-list-title",li_dom).text(scenes_new.name);
-		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇模板').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', new_id);
 		$('#scene-list').append(li_dom);
@@ -978,7 +978,7 @@ $('#scene-list').on('click', '.btn-delete-scene', function(e){
 	e.preventDefault();
   var scene_id = $(this).parents('li').data('id');
   var scene = current_data.scenes[scene_id];
-  if (confirm("確認刪除場景「"+scene.name+"」？")) {
+  if (confirm("確認刪除模板「"+scene.name+"」？")) {
     $(this).parents('li').remove();
     delete current_data.scenes[scene_id];
     localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
