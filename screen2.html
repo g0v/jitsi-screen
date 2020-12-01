@@ -391,7 +391,7 @@ label {
           <div class="screen-choose-body">
               <form class="form-screen-choose">
                   視窗動作：<button class="btn-focus btn btn-dark">最上層</button>
-                    <button class="btn-reopen btn btn-dark">重新開啟</button>
+                    <button class="btn-reopen btn btn-dark">彈出視窗</button>
                     <button class="btn-reupdate btn btn-dark">重新繪製</button>
                 <br>
                   畫面模板：<span class="scene-chooser"></span><br>
@@ -590,11 +590,8 @@ var update_preview_video = function(){
 
 var update_preview_content = function(content){
   //editor.setData(content);
-  scene_id = $("#preview-iframe").data('scene_id');
-  screen_id = $("#preview-iframe").data('screen_id');
-  if(scene_id == undefined) {
-    scene_id = current_data.screens[screen_id].scene_id;
-  }
+  var scene_id = $("#preview-iframe").data('scene_id');
+  var screen_id = $("#preview-iframe").data('screen_id');
   $("#preview-html textarea").val(content);
   $("#preview-html [name='scene-title']").val(current_data.scenes[scene_id].name);
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
@@ -609,14 +606,19 @@ var update_preview_content = function(content){
   $('#preview-iframe').contents().find('html').css('overflow', 'hidden');
   $("#card-scene-preview .card-header span").text("｜"+current_data.scenes[scene_id].name);
   update_preview_size();
-  update_preview_video();
+  if(screen_id != undefined) {
+    update_videos($('#preview-iframe')[0].contentWindow, screen_id);
+  }
+  else {
+    update_preview_video();
+  }
 };
 
 $('#btn-scene-editor-save').click(function(e){
-    scene_id = $("#preview-iframe").data('scene_id');
-    screen_id = $("#preview-iframe").data('screen_id');
+    var scene_id = $("#preview-iframe").data('scene_id');
+    var screen_id = $("#preview-iframe").data('screen_id');
     console.log("screen_id: "+screen_id+" scene_id: "+scene_id);
-    if(scene_id != undefined) {
+    if(screen_id == undefined) {
       var title = $("#preview-html [name='scene-title']").val();
       var content = $('#preview-html textarea').val();
       current_data.scenes[scene_id].name = title;
@@ -707,12 +709,11 @@ var get_list_from_content = function(content){
 $('#form-screen-new').submit(function(e){
 	e.preventDefault();
   var scene_id = $("#preview-iframe").data('scene_id');
-  if(scene_id == null){
+  if(scene_id == null || scene_id == undefined) {
     return;
   }
   var title = $('[name="title"]', this).val();
-  /*
-  var width = parseInt($('[name="width"]', this).val());
+  /*var width = parseInt($('[name="width"]', this).val());
   var height = parseInt($('[name="height"]', this).val());*/
   var width = parseInt($('#resize-form [name="width"]').val());
   var height = parseInt($('#resize-form [name="height"]').val());
@@ -725,7 +726,6 @@ $('#form-screen-new').submit(function(e){
 
   var idx = current_data.screens.length;
 
-  $("#preview-iframe").removeData('scene_id');
   $("#preview-iframe").data('screen_id', idx);
 
   current_data.screens.push({
@@ -770,36 +770,15 @@ $('#form-screen-new').submit(function(e){
   });
 
   $('#screen-choose-body-area .screen-choose-body').hide();
-  $('.btn-reopen', div_dom).hide();
+  $('.btn-focus', div_dom).hide();
   div_dom.show();
   update_screen_data();
   $('.screen-item').removeClass('active');
   $('#screen-item-' + idx).addClass('active');
 
-  var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
-  check_resize(win, width, height);
-  init_win_env(win, false, event_listener, idx);
-  win.document.open();
-  win.document.write(current_data.scenes[scene_id].content);
-  if (title) {
-      win.document.title = '畫面 ' + title;
-  } else {
-      win.document.title = '畫面 ' + idx;
-  }
-  win.onunload = function(){
-      $('#screen-choose-body-' + idx + ' .btn-reopen').show();
-      $('#screen-choose-body-' + idx + ' .btn-focus').hide();
-      win._isUnloading = true;
-      auto_detach_track();
-  };
-  $(win.document.body).css('overflow', 'hidden');
-  $(win.document.body).css('margin', 0);
-  $('.video-box', win.document).ready(function(){
-      update_screen_video();
-  });
-  windows[idx] = win;
-
-  // XXX
+  var scene = current_data.screens[idx];
+  $("#preview-iframe").data('screen_id', idx);
+  update_preview_content(scene.content);
 });
 
 $('#viewer-url-copy').on('click', function() {
@@ -819,9 +798,12 @@ $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
 $('#screen-choose-body-area').on('click', '.btn-reupdate', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
-    windows[idx].document.body.innerHTML = '';
-    windows[idx].document.write(current_data.screens[idx].content);
-    windows[idx].Jitsi.reload();
+    
+    if(windows[idx] != undefined) {
+      windows[idx].document.body.innerHTML = '';
+      windows[idx].document.write(current_data.screens[idx].content);
+      windows[idx].Jitsi.reload();
+    }
 });
 
 $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
@@ -964,13 +946,13 @@ $('#screen-list').on('click', '.screen-item', function(e){
 
     var scene_id = $('#screen-choose-body-' + idx).data('scene_id');
     var scene = current_data.screens[idx];
-    $("#preview-iframe").removeData('scene_id');
     $("#preview-iframe").data('screen_id', idx);
     update_preview_content(scene.content);
 });
 
 $('#scene-list').on('click', '.btn-preview', function(e){
 	e.preventDefault();
+  $("#preview-iframe").removeData('screen_id');
 
   $('#screen-choose-body-area .screen-choose-body').hide();
   $('.screen-item').removeClass('active');
@@ -1236,6 +1218,106 @@ $('#btn-access-audio').click(function(e){
     });
 });
 
+var update_videos = function(win, idx) {
+  var user_select = current_data.screens[idx].user_select;
+  $('.video-box', win.document).each(function(){
+      user_id = user_select[$(this).attr('data-id')];
+      if ('undefined' === typeof(user_id)) {
+          user_id = $(this).attr('data-user');
+      }
+      if (!$('video', this).length) {
+          $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
+          $(this).addClass('no-video');
+      }
+      if (!$('audio', this).length) {
+          $(this).append($('<audio autoplay="1"></audio>'));
+          $(this).addClass('no-audio');
+      }
+      var video_dom = $('video', this);
+      var audio_dom = $('audio', this);
+      var user_name = "none";
+      $(this).attr('data-result-user', user_id);
+      if ('undefined' === typeof(user_id) || user_id == 'none') {
+          var old_track = video_dom[0].__track;
+          if (old_track) {
+              video_detach(this, old_track);
+          }
+      } else if (user_id == 'viewer') {
+          user_name = "{viewer_name}";
+          var track = room.getLocalVideoTrack();
+          var old_track = video_dom[0].__track;
+          if (old_track) {
+              video_detach(this, old_track);
+          }
+          if (track) {
+              video_attach(this, track);
+          }
+      } else if (user_id.match && user_id.match(/^camera-/)) {
+          var device_id = user_id.split('-')[1];
+          get_local_video_track(device_id, function(track){
+              var old_track = video_dom[0].__track;
+              if (old_track) {
+                  video_detach(this, old_track);
+              }
+              video_attach(this, track);
+          });
+      } else {
+          var audio_track = null;
+          if (user_id == room.myUserId()) {
+              user_name = room.myName;
+              var track = room.getLocalVideoTrack();
+              var tracks = [];
+              if ('undefined' !== typeof(track)) {
+                  tracks.push(track);
+              }
+          } else if ('undefined' !== typeof(room.participants[user_id])) {
+              user_name = room.participants[user_id].getDisplayName();
+              var tracks = room.participants[user_id].getTracksByMediaType('video');
+              audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
+              if ($(this).is('.audio-mute')) {
+                  audio_track = null;
+              }
+          } else {
+              var old_track = video_dom[0].__track;
+              if (old_track) {
+                  video_detach(this, old_track);
+              }
+              old_track = audio_dom[0].__track;
+              if (old_track) {
+                  audio_detach(this, old_track);
+              }
+              return;
+          }
+
+          var old_track = video_dom[0].__track;
+          if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
+              video_detach(this, old_track);
+          }
+          if (tracks.length) {
+              if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
+                  video_attach(this, tracks[0]);
+              }
+              if ($(this).attr('data-select') == 'true') {
+                  selected_users[user_id] = 'select';
+              }
+          }
+
+          var old_track = audio_dom[0].__track;
+          if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
+              audio_detach(this, old_track);
+          }
+          if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
+              audio_attach(this, audio_track);
+          }
+          if (audio_track && $('audio', this)[0].paused) {
+              $('audio', this)[0].play();
+          }
+      }
+      $('username',$(this)).text(user_name);
+  });
+  win.Jitsi.fire('user_box_updated', {});
+}
+
 var update_screen_video = function(){
     auto_detach_track();
     for (var id in selected_users) {
@@ -1243,108 +1325,18 @@ var update_screen_video = function(){
             delete(selected_users[id]);
         }
     }
+
+    var screen_id = $("#preview-iframe").data('screen_id');
+    if(screen_id != undefined) {
+      update_videos($('#preview-iframe')[0].contentWindow, screen_id);
+    }
+
     for (var idx in windows) {
-        var user_select = current_data.screens[idx].user_select;
-        win = windows[idx];
-        if (win.closed) {
-            continue;
-        }
-        $('.video-box', win.document).each(function(){
-            user_id = user_select[$(this).attr('data-id')];
-            if ('undefined' === typeof(user_id)) {
-                user_id = $(this).attr('data-user');
-            }
-            if (!$('video', this).length) {
-                $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
-                $(this).addClass('no-video');
-            }
-            if (!$('audio', this).length) {
-                $(this).append($('<audio autoplay="1"></audio>'));
-                $(this).addClass('no-audio');
-            }
-            var video_dom = $('video', this);
-            var audio_dom = $('audio', this);
-            var user_name = "none";
-            $(this).attr('data-result-user', user_id);
-            if ('undefined' === typeof(user_id) || user_id == 'none') {
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    video_detach(this, old_track);
-                }
-            } else if (user_id == 'viewer') {
-                user_name = "{viewer_name}";
-                var track = room.getLocalVideoTrack();
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    video_detach(this, old_track);
-                }
-                if (track) {
-                    video_attach(this, track);
-                }
-            } else if (user_id.match && user_id.match(/^camera-/)) {
-                var device_id = user_id.split('-')[1];
-                get_local_video_track(device_id, function(track){
-                    var old_track = video_dom[0].__track;
-                    if (old_track) {
-                        video_detach(this, old_track);
-                    }
-                    video_attach(this, track);
-                });
-            } else {
-                var audio_track = null;
-                if (user_id == room.myUserId()) {
-                    user_name = room.myName;
-                    var track = room.getLocalVideoTrack();
-                    var tracks = [];
-                    if ('undefined' !== typeof(track)) {
-                        tracks.push(track);
-                    }
-                } else if ('undefined' !== typeof(room.participants[user_id])) {
-                    user_name = room.participants[user_id].getDisplayName();
-                    var tracks = room.participants[user_id].getTracksByMediaType('video');
-                    audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
-                    if ($(this).is('.audio-mute')) {
-                        audio_track = null;
-                    }
-                } else {
-                    var old_track = video_dom[0].__track;
-                    if (old_track) {
-                        video_detach(this, old_track);
-                    }
-                    old_track = audio_dom[0].__track;
-                    if (old_track) {
-                        audio_detach(this, old_track);
-                    }
-                    return;
-                }
-
-                var old_track = video_dom[0].__track;
-                if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
-                    video_detach(this, old_track);
-                }
-                if (tracks.length) {
-                    if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
-                        video_attach(this, tracks[0]);
-                    }
-                    if ($(this).attr('data-select') == 'true') {
-                        selected_users[user_id] = 'select';
-                    }
-                }
-
-                var old_track = audio_dom[0].__track;
-                if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
-                    audio_detach(this, old_track);
-                }
-                if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
-                    audio_attach(this, audio_track);
-                }
-                if (audio_track && $('audio', this)[0].paused) {
-                    $('audio', this)[0].play();
-                }
-            }
-            $('username',$(this)).text(user_name);
-        });
-        win.Jitsi.fire('user_box_updated', {});
+      var win = windows[idx];
+      if (win.closed) {
+          continue;
+      }
+      update_videos(win, idx);
     }
     reselected_users();
 };
