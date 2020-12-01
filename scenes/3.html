@@ -1,6 +1,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <style>
 .video-box { float:left; }
+.user-title {position: absolute; background-color: rgba(0,0,0,0.5); color: white;}
 #video-pool.user-1 .video-box {width: 100%; height: 100%}
 #video-pool.user-4 .video-box {width: 50%; height: 50%}
 #video-pool.user-9 .video-box {width: 33%; height: 33%}
@@ -24,8 +25,9 @@ var update_user = function(){
     $('#video-pool').html('');
     var user_count = 0;
     for (var user of users) {
-        $('#video-pool').append($('<div data-select="true"></div>').attr('data-user', user.id).addClass('video-box'));
-        user_count+=1;
+        $('#video-pool').append($('<div data-select="true"></div>').attr('data-user', user.id).addClass('video-box').append($('<h1></h1>').text(user.name).addClass('user-title')));
+
+user_count+=1;
         if(user_count >= 16)
           break;
     }
