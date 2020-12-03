@@ -1559,6 +1559,11 @@ var onConnected = function() {
         confID: jitsi_domain + '/' + jitsi_room
     };
 
+    // workaround
+    if (jitsi_domain == 'jitsi.jothon.online') {
+        confOptions.openBridgeChannel = true;
+    }
+
     $('#logined-area').show();
     var jitsi_room_url = 'https://' + jitsi_domain + '/' + jitsi_room;
     $('#jitsi-url').html(`<a href="${jitsi_room_url}" target="_blank">${jitsi_room_url}</a>`);
