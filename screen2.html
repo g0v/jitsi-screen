@@ -390,10 +390,13 @@ label {
         <script type="text/html" id="tmpl-screen-choose-body">
           <div class="screen-choose-body">
               <form class="form-screen-choose">
+                  <input type="checkbox" class="set-mute" name="set-mute">
+                  <label for="set-mute">Mute</label>
+                  <br>
                   視窗動作：<button class="btn-focus btn btn-dark">最上層</button>
                     <button class="btn-reopen btn btn-dark">彈出視窗</button>
                     <button class="btn-reupdate btn btn-dark">重新繪製</button>
-                <br>
+                  <br>
                   畫面模板：<span class="scene-chooser"></span><br>
                   畫面標題：<span class="screen-title"></span><br>
                   尺寸(本機)：<br>
@@ -607,7 +610,7 @@ var update_preview_content = function(content){
   $("#card-scene-preview .card-header span").text("｜"+current_data.scenes[scene_id].name);
   update_preview_size();
   if(screen_id != undefined) {
-    update_videos($('#preview-iframe')[0].contentWindow, screen_id);
+    update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
   }
   else {
     update_preview_video();
@@ -798,7 +801,7 @@ $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
 $('#screen-choose-body-area').on('click', '.btn-reupdate', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
-    
+
     if(windows[idx] != undefined) {
       windows[idx].document.body.innerHTML = '';
       windows[idx].document.write(current_data.screens[idx].content);
@@ -1218,7 +1221,7 @@ $('#btn-access-audio').click(function(e){
     });
 });
 
-var update_videos = function(win, idx) {
+var update_videos = function(win, idx, isPreview=false) {
   var user_select = current_data.screens[idx].user_select;
   $('.video-box', win.document).each(function(){
       user_id = user_select[$(this).attr('data-id')];
@@ -1306,11 +1309,18 @@ var update_videos = function(win, idx) {
           if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
               audio_detach(this, old_track);
           }
-          if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
-              audio_attach(this, audio_track);
+
+          if(!isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
+            if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
+                audio_attach(this, audio_track);
+            }
+            if (audio_track && $('audio', this)[0].paused) {
+                $('audio', this)[0].play();
+            }
           }
-          if (audio_track && $('audio', this)[0].paused) {
-              $('audio', this)[0].play();
+          else {
+            audio_detach(this, audio_track);
+            $('audio', this)[0].pause();
           }
       }
       $('username',$(this)).text(user_name);
@@ -1325,12 +1335,10 @@ var update_screen_video = function(){
             delete(selected_users[id]);
         }
     }
-
     var screen_id = $("#preview-iframe").data('screen_id');
     if(screen_id != undefined) {
-      update_videos($('#preview-iframe')[0].contentWindow, screen_id);
+      update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
     }
-
     for (var idx in windows) {
       var win = windows[idx];
       if (win.closed) {
@@ -1340,6 +1348,9 @@ var update_screen_video = function(){
     }
     reselected_users();
 };
+$('#screen-choose-body-area').on('click', '.set-mute', function(e){
+  update_screen_video();
+});
 
 $('[name="bot-name"]').change(function(){
   $("#section-main .bot-name").text("Bot: "+$(this).val());
