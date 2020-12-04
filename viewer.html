@@ -477,12 +477,12 @@ var onConnected = function() {
             room.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, level_changed);
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
                 if (message.type == 'response_scene') {
-                  if (message.message.current_data.version != current_data.version) {
+                  if (host_id == message.host_id && message.message.current_data.version != current_data.version) {
                     current_data = message.message.current_data;
                     update_content();
                   }
                 } else if (message.type == 'update_scene') {
-                  if (message.message.current_data.version != current_data.version) {
+                  if (host_id == message.host_id && message.message.current_data.version != current_data.version) {
                     current_data = message.message.current_data;
                     update_content();
                   }

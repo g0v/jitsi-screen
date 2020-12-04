@@ -1137,7 +1137,7 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     if (room) {
         console.log('broadcast scenes to all viewers');
         room.setLocalParticipantProperty('scene_version', current_data.version);
-        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data()});
+        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data(), host_id: getHostId()});
     }
 });
 
@@ -1607,7 +1607,7 @@ var onConnected = function() {
                             return;
                         }
                         console.log('User ' + participant.getId() + ' requested scenes, responsed');
-                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data()});
+                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data(), host_id: getHostId()});
                     }
             });
 
