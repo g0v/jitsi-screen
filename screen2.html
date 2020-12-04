@@ -270,16 +270,6 @@ label {
       </div>
       <div class="card-body">
         <div id="logined-area" style="display:none">
-            <div>
-                畫面：
-                <select id="output-video" style="display:none"></select>
-                <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
-            </div>
-            <div>
-                聲音：
-                <select id="output-audio" style="display:none"></select>
-                <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
-            </div>
             Jitsi URL: <span id="jitsi-url"></span><br>
             Viewer URL:
             <input type="text" readonly="readonly" id="viewer-url" style=""><button id="viewer-url-copy" style="position: relative; margin-left: -4em; width: 4em; bottom: 3px;" class="btn btn-dark btn-sm">複製</button>
@@ -338,8 +328,21 @@ label {
             <span class="px-1">x</span>
             <input type="text" name="height" value="900" size="5">
             <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
-            <div style="display: none"><span>｜</span><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="16" style="width: 3em;"></div>
+            <div style="display: none"><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="16" style="width: 3em;"></div>
+            <span>｜</span>
+            <div>
+                畫面：
+                <select id="output-video" style="display:none; width: 8em;"></select>
+                <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
+            </div>
+            <span>｜</span>
+            <div>
+                聲音：
+                <select id="output-audio" style="display:none; width: 8em;"></select>
+                <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
+            </div>
           </form>
+
       </div>
     </div>
     <div class="card main-card-right" id="card-scene-choose">
