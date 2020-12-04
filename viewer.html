@@ -40,8 +40,8 @@
   border-width: 0 8px 8px 0;
   display: inline-block;
   padding: 8px;
-  transform: rotate(-135deg);
-  -webkit-transform: rotate(-135deg);
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
 }
 </style>
 </head>
@@ -59,15 +59,15 @@
   <div style="flex: 1;">
     <iframe id="result-iframe"></iframe>
   </div>
-  <div id="footer" class="d-none">
+  <div id="footer" class="">
     <div class="mr-4">
       畫面：
-      <select id="output-video" style="display:none"></select>
+      <select id="output-video" style="display:none; width: 8em;"></select>
       <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
     </div>
     <div class="">
         聲音：
-        <select id="output-audio" style="display:none"></select>
+        <select id="output-audio" style="display:none; width: 8em;"></select>
         <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
     </div>
   </div>
