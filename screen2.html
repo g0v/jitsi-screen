@@ -1315,9 +1315,6 @@ var update_videos = function(win, idx, isPreview=false) {
           if (audio_track && $('audio', this)[0].paused && !isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
               $('audio', this)[0].play();
           }
-          else {
-            $('audio', this)[0].pause();
-          }
       }
       $('username',$(this)).text(user_name);
   });
