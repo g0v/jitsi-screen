@@ -338,7 +338,7 @@ label {
             <span class="px-1">x</span>
             <input type="text" name="height" value="900" size="5">
             <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
-            <div style="display: none"><span>｜</span><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;"></div>
+            <div style="display: none"><span>｜</span><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="16" style="width: 3em;"></div>
           </form>
       </div>
     </div>
@@ -598,11 +598,12 @@ var update_preview_content = function(content){
   $("#preview-html textarea").val(content);
   $("#preview-html [name='scene-title']").val(current_data.scenes[scene_id].name);
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
+  preview_fake_users = [];
   for (var i = 0; i < preview_fake_user; i ++) {
       preview_fake_counter ++;
       preview_fake_users.push(preview_fake_counter);
   }
-  init_win_env($('#preview-iframe')[0].contentWindow, true, function(){}, 0);
+  init_win_env($('#preview-iframe')[0].contentWindow, screen_id == undefined, function(){}, 0);
   $('#preview-iframe')[0].contentDocument.open();
   $('#preview-iframe')[0].contentDocument.write(content);
   $('#preview-iframe')[0].contentDocument.close();
@@ -709,7 +710,7 @@ var get_list_from_content = function(content){
     return list;
 };
 
-$('#form-screen-new').submit(function(e){
+  $('#form-screen-new').submit(function(e){
 	e.preventDefault();
   var scene_id = $("#preview-iframe").data('scene_id');
   if(scene_id == null || scene_id == undefined) {
