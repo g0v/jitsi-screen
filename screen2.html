@@ -1309,17 +1309,13 @@ var update_videos = function(win, idx, isPreview=false) {
           if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
               audio_detach(this, old_track);
           }
-
-          if(!isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
-            if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
-                audio_attach(this, audio_track);
-            }
-            if (audio_track && $('audio', this)[0].paused) {
-                $('audio', this)[0].play();
-            }
+          if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
+              audio_attach(this, audio_track);
+          }
+          if (audio_track && $('audio', this)[0].paused && !isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
+              $('audio', this)[0].play();
           }
           else {
-            audio_detach(this, audio_track);
             $('audio', this)[0].pause();
           }
       }
