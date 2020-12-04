@@ -475,7 +475,7 @@ var randomString = function(len) {
 }*/
 
 $(function(){
-    $("#login-url").attr("value",$("#login-url").attr("value")+randomString(10));
+    $("#login-url").attr("value","https://meet.jit.si/"+randomString(10));
     var loading_promises = [];
     $.get(scene_config, function(loading_scenes){
         for (let loading_scene of loading_scenes) {
