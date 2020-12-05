@@ -157,11 +157,11 @@ label {
 #card-scene-preview .card-body {
     padding: 0;
 }
-#btn-preview-html {
-  position: absolute;
-  right: 5px;
-  top: 5px;
+#btn-preview-html, #btn-preview-pop {
+  float: right;
   border-radius: 0;
+  margin-right: 2px;
+  vertical-align: middle;
 }
 #form-scene-editor {
 	display: flex;
@@ -307,7 +307,9 @@ label {
     </div>
     <div class="card" id="card-scene-preview">
       <div class="card-header text-light bg-dark">
-        預覽<span></span><button class="btn btn-secondary" id="btn-preview-html" style="">&lt;/&gt;</button>
+        預覽<span></span>
+        <button class="btn btn-secondary btn-sm" id="btn-preview-html">&lt;/&gt;</button>
+        <button class="btn btn-secondary btn-sm" id="btn-preview-pop">pop</button>
       </div>
       <div class="card-body">
         <div id="preview-html" class="d-none">
@@ -428,6 +430,7 @@ var scene_config = 'scenes/scenes.json';
 var message_logs = [];
 var current_data = null;
 var windows = {};
+var preview_window = null;
 
 var load_data = function(data){
   current_data = data;
@@ -822,6 +825,37 @@ $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
     } else {
         windows[idx].document.title = '畫面 ' + idx;
     }
+});
+
+$('#btn-preview-pop').on('click', function(e){
+  e.preventDefault();
+  var width = parseInt($('#resize-form [name="width"]').val());
+  var height = parseInt($('#resize-form [name="height"]').val());
+  var idx = $("#preview-iframe").data('screen_id');
+  if(idx == undefined) {
+    return;
+  }
+  var win = window.open('', '預覽', config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
+
+  check_resize(win, width, height);
+  init_win_env(win, false, event_listener, idx);
+  win.document.open();
+  win.document.write(current_data.screens[idx].content);
+  win.onunload = function(){
+      $('#btn-preview-pop').show();
+  };
+  $('#btn-preview-pop').hide();
+  win.onunload = function(){
+      $('#btn-preview-pop').show();
+      win._isUnloading = true;
+      auto_detach_track();
+  };
+  $(win.document.body).css('overflow', 'hidden');
+  $(win.document.body).css('margin', 0);
+  $('.video-box', win.document).ready(function(){
+      update_screen_video();
+  });
+  preview_window = win;
 });
 
 $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
@@ -1335,6 +1369,9 @@ var update_screen_video = function(){
     var screen_id = $("#preview-iframe").data('screen_id');
     if(screen_id != undefined) {
       update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
+      if(preview_window != null) {
+        update_videos(preview_window, screen_id, true);
+      }
     }
     for (var idx in windows) {
       var win = windows[idx];
