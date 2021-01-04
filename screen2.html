@@ -157,11 +157,11 @@ label {
 #card-scene-preview .card-body {
     padding: 0;
 }
-#btn-preview-html {
-  position: absolute;
-  right: 5px;
-  top: 5px;
+#btn-preview-html, #btn-preview-pop {
+  float: right;
   border-radius: 0;
+  margin-right: 2px;
+  vertical-align: middle;
 }
 #form-scene-editor {
 	display: flex;
@@ -196,11 +196,16 @@ label {
   bottom: 20px;
   right: 20px;
 }
+.modal-footer img {
+  height: 4em;
+  padding: 0.5em;
+}
+
 </style>
 </head>
 <body>
 <div class="flex-column" id="section-login" style="display: flex; height: 100vh;">
-  <a href="https://github.com/g0v/jitsi-screen" target="_blank" style="position: fixed; z-index: 99999999; right: 0;"><img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+  <a href="https://github.com/g0v/jitsi-screen" target="_blank" style="position: fixed; z-index: 999; right: 0;"><img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
   <nav class="navbar navbar-dark bg-dark">
     <a class="navbar-brand" href="/jitsi-screen/screen2.html">揪己家 Jo Jitsi Plus</a>
     <div class="mr-auto">
@@ -221,7 +226,7 @@ label {
         </tr>
         <tr>
           <td><label for="login-name" class="form-label">Bot Name：</label></td>
-          <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control" placeholder="請輸入管理員名稱..." value="Jothon Helper" required="required"></td>
+          <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control" placeholder="請輸入管理員名稱..." value="Jo Jitsi Plus" required="required"></td>
         </tr>
       </table>
       <button type="submit" class="btn btn-lg btn-dark px-4 m-4">開始使用</button>
@@ -242,6 +247,10 @@ label {
           <p>- 簡化直播畫面擷取的複雜度，由 HTML 客製化不同直播場景、圖層，人人都能當導播。</p>
           <p>- 除了視訊會議，也有單向或多向的畫面操控及互動，因應活動功能，也能用於老師授課、線上客服等等。</p>
         </div>
+        <div class="modal-footer">
+          <img class="m-auto" src="assets/img/jothon_online.png">
+          <img class="m-auto" src="assets/img/jothon.png">
+        </div>
       </div>
     </div>
   </div>
@@ -261,16 +270,6 @@ label {
       </div>
       <div class="card-body">
         <div id="logined-area" style="display:none">
-            <div>
-                畫面：
-                <select id="output-video" style="display:none"></select>
-                <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
-            </div>
-            <div>
-                聲音：
-                <select id="output-audio" style="display:none"></select>
-                <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
-            </div>
             Jitsi URL: <span id="jitsi-url"></span><br>
             Viewer URL:
             <input type="text" readonly="readonly" id="viewer-url" style=""><button id="viewer-url-copy" style="position: relative; margin-left: -4em; width: 4em; bottom: 3px;" class="btn btn-dark btn-sm">複製</button>
@@ -298,7 +297,7 @@ label {
     		<!--form id="form-scene-editor">
     			<div class="input-group input-group-sm mb-3" id="div-scene-editor-name">
     				<div class="input-group-prepend">
-    					<span class="input-group-text" id="inputGroup-sizing-sm">場景模板</span>
+    					<span class="input-group-text" id="inputGroup-sizing-sm">模板</span>
     				</div>
     				<input type="text" class="form-control" name="name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
     			</div>
@@ -308,12 +307,14 @@ label {
     </div>
     <div class="card" id="card-scene-preview">
       <div class="card-header text-light bg-dark">
-        預覽<span></span><button class="btn btn-secondary" id="btn-preview-html" style="">&lt;/&gt;</button>
+        預覽<span></span>
+        <button class="btn btn-secondary btn-sm" id="btn-preview-html">&lt;/&gt;</button>
+        <button class="btn btn-secondary btn-sm" id="btn-preview-pop">pop</button>
       </div>
       <div class="card-body">
         <div id="preview-html" class="d-none">
           <div class="p-2">
-            <label for="scene-title">場景模板</label><input type="text" name=scene-title maxlength="12">
+            <label for="scene-title">畫面模板</label><input type="text" name=scene-title maxlength="12">
             <button class="btn btn-secondary btn-sm ml-4" type="button" id="btn-editor-add-video">添加視訊</button>
           </div>
           <textarea class="container-fluid">
@@ -325,18 +326,31 @@ label {
       <div class="card-footer">
           <form id="resize-form" class="form-inline" style="margin-block-end: 0">
             <span class="px-1">預覽尺寸</span>
-            <input type="text" name="width" value="1600" size="5">
+            <input type="text" name="width" value="1600" size="5" style="width: 4em;">
             <span class="px-1">x</span>
-            <input type="text" name="height" value="900" size="5">
+            <input type="text" name="height" value="900" size="5" style="width: 4em;">
             <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
-            <div style="display: none"><span>｜</span><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="4" style="width: 3em;"></div>
+            <div style="display: none"><label for="preview-user">預覽線上人數</label><input type="number" name="preview-user" value="16" style="width: 3em;"></div>
+            <span>｜</span>
+            <div>
+                畫面：
+                <select id="output-video" style="display:none; width: 7em;"></select>
+                <button id="btn-access-video" class="btn btn-dark btn-sm mb-1">同意使用攝影機</button>
+            </div>
+            <span>｜</span>
+            <div>
+                聲音：
+                <select id="output-audio" style="display:none; width: 7em;"></select>
+                <button id="btn-access-audio" class="btn btn-dark btn-sm mb-1">同意使用麥克風</button>
+            </div>
           </form>
+
       </div>
     </div>
     <div class="card main-card-right" id="card-scene-choose">
       <div class="card-header text-light bg-secondary">
-    	  場景列表｜
-        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增空白場景</button>
+    	  模板列表｜
+        <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-add"><i class="fas fa-plus"></i> 新增空白模板</button>
         <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-import"><i class="fas fa-sign-in-alt"></i> 匯入</button>
         <input type="file" name="scene_file" id="scene-file-input" accept=".json" style="display: none;"/>
         <button class="btn btn-dark btn-sm" type="button" id="btn-scene-choose-export"><i class="fas fa-sign-out-alt"></i> 匯出</button>
@@ -369,7 +383,7 @@ label {
       <div id="screen-choose-body-area">
         <div class="screen-choose-body" id="screen-choose-body-new">
             <form class="m-0" id="form-screen-new">
-              <!--label for="scene-chooser">選擇場景</label><select id="scene-chooser" name="scene-chooser"></select><br-->
+              <!--label for="scene-chooser">選擇模板</label><select id="scene-chooser" name="scene-chooser"></select><br-->
               <label for="title">畫面標題</label><input type="text" placeholder="可不輸入" name="title"><br>
               <!--尺寸(本機)：<br>
               <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
@@ -381,11 +395,14 @@ label {
         <script type="text/html" id="tmpl-screen-choose-body">
           <div class="screen-choose-body">
               <form class="form-screen-choose">
+                  <input type="checkbox" class="set-mute" name="set-mute">
+                  <label for="set-mute">Mute</label>
+                  <br>
                   視窗動作：<button class="btn-focus btn btn-dark">最上層</button>
-                    <button class="btn-reopen btn btn-dark">重新開啟</button>
+                    <button class="btn-reopen btn btn-dark">彈出視窗</button>
                     <button class="btn-reupdate btn btn-dark">重新繪製</button>
-                <br>
-                  場景模板：<span class="scene-chooser"></span><br>
+                  <br>
+                  畫面模板：<span class="scene-chooser"></span><br>
                   畫面標題：<span class="screen-title"></span><br>
                   尺寸(本機)：<br>
                   <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
@@ -413,6 +430,7 @@ var scene_config = 'scenes/scenes.json';
 var message_logs = [];
 var current_data = null;
 var windows = {};
+var preview_window = null;
 
 var load_data = function(data){
   current_data = data;
@@ -422,7 +440,7 @@ var load_data = function(data){
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
 		var scene = current_data.scenes[scene_id];
     $(".scene-list-title",li_dom).text(scene.name);
-		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇模板').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', scene_id);
 		$('#scene-list').append(li_dom);
@@ -438,6 +456,20 @@ var get_absolute_url = function(ref_url, path){
     return (new URL(path, ref_url)).href;
 }
 
+var randomString = function() {
+  var taglist = ["Congress","Media","ChildrenandChildren","g0v","GovernmentProcurement","Population","Politics","Welfare","Election","Education","Labor","Ecology","Law","Architecture","Transportation","Energy","DemocraticParticipation","Finance","Knowledge","Language",
+"Land","Map","Agenda","Contacts","Animals","Environment","PublicWelfare","Visualization","Art","Agriculture","Life","CivilService","Record","Community","News","Supervision",
+"LeftFood","Hackathon","Urban","Economy","History","NPO","Tools","OpenCulture","Translation","LandAdministration","OpenInformation","Sharing","Database","Text","Policy",
+"Disaster","Game","Statistics","Gender","Text","Medical","TransitionalJustice","FactCheck","IndigenousPeople","OpenGovernment","Parliament","Birth","Psychology","Labor","China","Meteorology","Residence","Homelessness","Health","CitizenParticipation",
+"GenderEquality","Blockchain","OpenSource","SocialMedia","InformationWar","Summit","CommonLand","lab","EmptyPollution","PictureBook","HealthCare","PublicOpinion","Society","Earthquake","NewResidents","Corrections","UrbanPlanning","Backup","HumanRights",
+"Corruption","AI","Industry","Referendum","voting","epidemic"];
+  var str = "";
+  for (var i=0; i<3; i++) {
+    str += taglist[Math.floor(Math.random() * taglist.length)];
+  }
+  return str;
+}
+/*
 var randomString = function(len) {
 　　var $chars = "abcdefghijklmnopqrstuvwxyz1234567890";
 　　var maxPos = $chars.length;
@@ -446,7 +478,7 @@ var randomString = function(len) {
 　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
 　　}
 　　return pwd;
-}
+}*/
 
 $(function(){
     $("#login-url").attr("value","https://meet.jit.si/"+randomString(10));
@@ -567,33 +599,36 @@ var update_preview_video = function(){
 
 var update_preview_content = function(content){
   //editor.setData(content);
-  scene_id = $("#preview-iframe").data('scene_id');
-  screen_id = $("#preview-iframe").data('screen_id');
-  if(scene_id == undefined) {
-    scene_id = current_data.screens[screen_id].scene_id;
-  }
+  var scene_id = $("#preview-iframe").data('scene_id');
+  var screen_id = $("#preview-iframe").data('screen_id');
   $("#preview-html textarea").val(content);
   $("#preview-html [name='scene-title']").val(current_data.scenes[scene_id].name);
   var preview_fake_user = parseInt($('#resize-form [name="preview-user"]').val());
+  preview_fake_users = [];
   for (var i = 0; i < preview_fake_user; i ++) {
       preview_fake_counter ++;
       preview_fake_users.push(preview_fake_counter);
   }
-  init_win_env($('#preview-iframe')[0].contentWindow, true, function(){}, 0);
+  init_win_env($('#preview-iframe')[0].contentWindow, screen_id == undefined, function(){}, 0);
   $('#preview-iframe')[0].contentDocument.open();
   $('#preview-iframe')[0].contentDocument.write(content);
   $('#preview-iframe')[0].contentDocument.close();
   $('#preview-iframe').contents().find('html').css('overflow', 'hidden');
   $("#card-scene-preview .card-header span").text("｜"+current_data.scenes[scene_id].name);
   update_preview_size();
-  update_preview_video();
+  if(screen_id != undefined) {
+    update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
+  }
+  else {
+    update_preview_video();
+  }
 };
 
 $('#btn-scene-editor-save').click(function(e){
-    scene_id = $("#preview-iframe").data('scene_id');
-    screen_id = $("#preview-iframe").data('screen_id');
+    var scene_id = $("#preview-iframe").data('scene_id');
+    var screen_id = $("#preview-iframe").data('screen_id');
     console.log("screen_id: "+screen_id+" scene_id: "+scene_id);
-    if(scene_id != undefined) {
+    if(screen_id == undefined) {
       var title = $("#preview-html [name='scene-title']").val();
       var content = $('#preview-html textarea').val();
       current_data.scenes[scene_id].name = title;
@@ -681,15 +716,14 @@ var get_list_from_content = function(content){
     return list;
 };
 
-$('#form-screen-new').submit(function(e){
+  $('#form-screen-new').submit(function(e){
 	e.preventDefault();
   var scene_id = $("#preview-iframe").data('scene_id');
-  if(scene_id == null){
+  if(scene_id == null || scene_id == undefined) {
     return;
   }
   var title = $('[name="title"]', this).val();
-  /*
-  var width = parseInt($('[name="width"]', this).val());
+  /*var width = parseInt($('[name="width"]', this).val());
   var height = parseInt($('[name="height"]', this).val());*/
   var width = parseInt($('#resize-form [name="width"]').val());
   var height = parseInt($('#resize-form [name="height"]').val());
@@ -702,7 +736,6 @@ $('#form-screen-new').submit(function(e){
 
   var idx = current_data.screens.length;
 
-  $("#preview-iframe").removeData('scene_id');
   $("#preview-iframe").data('screen_id', idx);
 
   current_data.screens.push({
@@ -747,36 +780,15 @@ $('#form-screen-new').submit(function(e){
   });
 
   $('#screen-choose-body-area .screen-choose-body').hide();
-  $('.btn-reopen', div_dom).hide();
+  $('.btn-focus', div_dom).hide();
   div_dom.show();
   update_screen_data();
   $('.screen-item').removeClass('active');
   $('#screen-item-' + idx).addClass('active');
 
-  var win = window.open('', 'screen-' + idx, config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
-  check_resize(win, width, height);
-  init_win_env(win, false, event_listener, idx);
-  win.document.open();
-  win.document.write(current_data.scenes[scene_id].content);
-  if (title) {
-      win.document.title = '畫面 ' + title;
-  } else {
-      win.document.title = '畫面 ' + idx;
-  }
-  win.onunload = function(){
-      $('#screen-choose-body-' + idx + ' .btn-reopen').show();
-      $('#screen-choose-body-' + idx + ' .btn-focus').hide();
-      win._isUnloading = true;
-      auto_detach_track();
-  };
-  $(win.document.body).css('overflow', 'hidden');
-  $(win.document.body).css('margin', 0);
-  $('.video-box', win.document).ready(function(){
-      update_screen_video();
-  });
-  windows[idx] = win;
-
-  // XXX
+  var scene = current_data.screens[idx];
+  $("#preview-iframe").data('screen_id', idx);
+  update_preview_content(scene.content);
 });
 
 $('#viewer-url-copy').on('click', function() {
@@ -796,9 +808,12 @@ $('#screen-choose-body-area').on('click', '.btn-focus', function(e){
 $('#screen-choose-body-area').on('click', '.btn-reupdate', function(e){
     e.preventDefault();
     var idx = $(this).parents('.screen-choose-body').attr('id').split('-')[3];
-    windows[idx].document.body.innerHTML = '';
-    windows[idx].document.write(current_data.screens[idx].content);
-    windows[idx].Jitsi.reload();
+
+    if(windows[idx] != undefined) {
+      windows[idx].document.body.innerHTML = '';
+      windows[idx].document.write(current_data.screens[idx].content);
+      windows[idx].Jitsi.reload();
+    }
 });
 
 $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
@@ -810,6 +825,37 @@ $('#screen-choose-body-area').on('change', '[name="title"]', function(e){
     } else {
         windows[idx].document.title = '畫面 ' + idx;
     }
+});
+
+$('#btn-preview-pop').on('click', function(e){
+  e.preventDefault();
+  var width = parseInt($('#resize-form [name="width"]').val());
+  var height = parseInt($('#resize-form [name="height"]').val());
+  var idx = $("#preview-iframe").data('screen_id');
+  if(idx == undefined) {
+    return;
+  }
+  var win = window.open('', '預覽', config='menubar=no,status=no,toolbar=no,height=' + height + ',width=' + width);
+
+  check_resize(win, width, height);
+  init_win_env(win, false, event_listener, idx);
+  win.document.open();
+  win.document.write(current_data.screens[idx].content);
+  win.onunload = function(){
+      $('#btn-preview-pop').show();
+  };
+  $('#btn-preview-pop').hide();
+  win.onunload = function(){
+      $('#btn-preview-pop').show();
+      win._isUnloading = true;
+      auto_detach_track();
+  };
+  $(win.document.body).css('overflow', 'hidden');
+  $(win.document.body).css('margin', 0);
+  $('.video-box', win.document).ready(function(){
+      update_screen_video();
+  });
+  preview_window = win;
 });
 
 $('#screen-choose-body-area').on('click', '.btn-reopen', function(e){
@@ -875,7 +921,7 @@ $('#btn-scene-choose-add').click(function(e){
     current_data.scenes[new_id] = scenes_new;
 		var li_dom = $('<li><div><a class="scene-list-title"></a></div></li>');
     $(".scene-list-title",li_dom).text(scenes_new.name);
-		$("div",li_dom).append($('<button></button>').text('選擇場景').addClass('btn btn-dark btn-sm btn-preview'));
+		$("div",li_dom).append($('<button></button>').text('選擇模板').addClass('btn btn-dark btn-sm btn-preview'));
 		$("div",li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
 		li_dom.data('id', new_id);
 		$('#scene-list').append(li_dom);
@@ -941,13 +987,13 @@ $('#screen-list').on('click', '.screen-item', function(e){
 
     var scene_id = $('#screen-choose-body-' + idx).data('scene_id');
     var scene = current_data.screens[idx];
-    $("#preview-iframe").removeData('scene_id');
     $("#preview-iframe").data('screen_id', idx);
     update_preview_content(scene.content);
 });
 
 $('#scene-list').on('click', '.btn-preview', function(e){
 	e.preventDefault();
+  $("#preview-iframe").removeData('screen_id');
 
   $('#screen-choose-body-area .screen-choose-body').hide();
   $('.screen-item').removeClass('active');
@@ -964,7 +1010,7 @@ $('#scene-list').on('click', '.btn-delete-scene', function(e){
 	e.preventDefault();
   var scene_id = $(this).parents('li').data('id');
   var scene = current_data.scenes[scene_id];
-  if (confirm("確認刪除場景「"+scene.name+"」？")) {
+  if (confirm("確認刪除模板「"+scene.name+"」？")) {
     $(this).parents('li').remove();
     delete current_data.scenes[scene_id];
     localStorage.setItem('current_data', JSON.stringify(current_data.scenes));
@@ -1128,7 +1174,7 @@ $('#screen-choose-body-area').on('click', '.btn-add-viewer', function(e){
     if (room) {
         console.log('broadcast scenes to all viewers');
         room.setLocalParticipantProperty('scene_version', current_data.version);
-        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data()});
+        room.broadcastEndpointMessage({type: 'update_scene', message: get_scene_data(), host_id: getHostId()});
     }
 });
 
@@ -1213,6 +1259,106 @@ $('#btn-access-audio').click(function(e){
     });
 });
 
+var update_videos = function(win, idx, isPreview=false) {
+  var user_select = current_data.screens[idx].user_select;
+  $('.video-box', win.document).each(function(){
+      user_id = user_select[$(this).attr('data-id')];
+      if ('undefined' === typeof(user_id)) {
+          user_id = $(this).attr('data-user');
+      }
+      if (!$('video', this).length) {
+          $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
+          $(this).addClass('no-video');
+      }
+      if (!$('audio', this).length) {
+          $(this).append($('<audio autoplay="1"></audio>'));
+          $(this).addClass('no-audio');
+      }
+      var video_dom = $('video', this);
+      var audio_dom = $('audio', this);
+      var user_name = "none";
+      $(this).attr('data-result-user', user_id);
+      if ('undefined' === typeof(user_id) || user_id == 'none') {
+          var old_track = video_dom[0].__track;
+          if (old_track) {
+              video_detach(this, old_track);
+          }
+      } else if (user_id == 'viewer') {
+          user_name = "{viewer_name}";
+          var track = room.getLocalVideoTrack();
+          var old_track = video_dom[0].__track;
+          if (old_track) {
+              video_detach(this, old_track);
+          }
+          if (track) {
+              video_attach(this, track);
+          }
+      } else if (user_id.match && user_id.match(/^camera-/)) {
+          var device_id = user_id.split('-')[1];
+          get_local_video_track(device_id, function(track){
+              var old_track = video_dom[0].__track;
+              if (old_track) {
+                  video_detach(this, old_track);
+              }
+              video_attach(this, track);
+          });
+      } else {
+          var audio_track = null;
+          if (user_id == room.myUserId()) {
+              user_name = room.myName;
+              var track = room.getLocalVideoTrack();
+              var tracks = [];
+              if ('undefined' !== typeof(track)) {
+                  tracks.push(track);
+              }
+          } else if ('undefined' !== typeof(room.participants[user_id])) {
+              user_name = room.participants[user_id].getDisplayName();
+              var tracks = room.participants[user_id].getTracksByMediaType('video');
+              audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
+              if ($(this).is('.audio-mute')) {
+                  audio_track = null;
+              }
+          } else {
+              var old_track = video_dom[0].__track;
+              if (old_track) {
+                  video_detach(this, old_track);
+              }
+              old_track = audio_dom[0].__track;
+              if (old_track) {
+                  audio_detach(this, old_track);
+              }
+              return;
+          }
+
+          var old_track = video_dom[0].__track;
+          if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
+              video_detach(this, old_track);
+          }
+          if (tracks.length) {
+              if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
+                  video_attach(this, tracks[0]);
+              }
+              if ($(this).attr('data-select') == 'true') {
+                  selected_users[user_id] = 'select';
+              }
+          }
+
+          var old_track = audio_dom[0].__track;
+          if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
+              audio_detach(this, old_track);
+          }
+          if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
+              audio_attach(this, audio_track);
+          }
+          if (audio_track && $('audio', this)[0].paused && !isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
+              $('audio', this)[0].play();
+          }
+      }
+      $('username',$(this)).text(user_name);
+  });
+  win.Jitsi.fire('user_box_updated', {});
+}
+
 var update_screen_video = function(){
     auto_detach_track();
     for (var id in selected_users) {
@@ -1220,106 +1366,25 @@ var update_screen_video = function(){
             delete(selected_users[id]);
         }
     }
+    var screen_id = $("#preview-iframe").data('screen_id');
+    if(screen_id != undefined) {
+      update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
+      if(preview_window != null) {
+        update_videos(preview_window, screen_id, true);
+      }
+    }
     for (var idx in windows) {
-        var user_select = current_data.screens[idx].user_select;
-        win = windows[idx];
-        if (win.closed) {
-            continue;
-        }
-        $('.video-box', win.document).each(function(){
-            user_id = user_select[$(this).attr('data-id')];
-            if ('undefined' === typeof(user_id)) {
-                user_id = $(this).attr('data-user');
-            }
-            if (!$('video', this).length) {
-                $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
-                $(this).addClass('no-video');
-            }
-            if (!$('audio', this).length) {
-                $(this).append($('<audio autoplay="1"></audio>'));
-                $(this).addClass('no-audio');
-            }
-            var video_dom = $('video', this);
-            var audio_dom = $('audio', this);
-            $(this).attr('data-result-user', user_id);
-            if ('undefined' === typeof(user_id) || user_id == 'none') {
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    video_detach(this, old_track);
-                }
-            } else if (user_id == 'viewer') {
-                var track = room.getLocalVideoTrack();
-                var old_track = video_dom[0].__track;
-                if (old_track) {
-                    video_detach(this, old_track);
-                }
-                if (track) {
-                    video_attach(this, track);
-                }
-            } else if (user_id.match && user_id.match(/^camera-/)) {
-                var device_id = user_id.split('-')[1];
-                get_local_video_track(device_id, function(track){
-                    var old_track = video_dom[0].__track;
-                    if (old_track) {
-                        video_detach(this, old_track);
-                    }
-                    video_attach(this, track);
-                });
-            } else {
-                var audio_track = null;
-                if (user_id == room.myUserId()) {
-                    var track = room.getLocalVideoTrack();
-                    var tracks = [];
-                    if ('undefined' !== typeof(track)) {
-                        tracks.push(track);
-                    }
-                } else if ('undefined' !== typeof(room.participants[user_id])) {
-                    var tracks = room.participants[user_id].getTracksByMediaType('video');
-                    audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
-                    if ($(this).is('.audio-mute')) {
-                        audio_track = null;
-                    }
-                } else {
-                    var old_track = video_dom[0].__track;
-                    if (old_track) {
-                        video_detach(this, old_track);
-                    }
-                    old_track = audio_dom[0].__track;
-                    if (old_track) {
-                        audio_detach(this, old_track);
-                    }
-                    return;
-                }
-
-                var old_track = video_dom[0].__track;
-                if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
-                    video_detach(this, old_track);
-                }
-                if (tracks.length) {
-                    if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
-                        video_attach(this, tracks[0]);
-                    }
-                    if ($(this).attr('data-select') == 'true') {
-                        selected_users[user_id] = 'select';
-                    }
-                }
-
-                var old_track = audio_dom[0].__track;
-                if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
-                    audio_detach(this, old_track);
-                }
-                if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
-                    audio_attach(this, audio_track);
-                }
-                if (audio_track && $('audio', this)[0].paused) {
-                    $('audio', this)[0].play();
-                }
-            }
-        });
-        win.Jitsi.fire('user_box_updated', {});
+      var win = windows[idx];
+      if (win.closed) {
+          continue;
+      }
+      update_videos(win, idx);
     }
     reselected_users();
 };
+$('#screen-choose-body-area').on('click', '.set-mute', function(e){
+  update_screen_video();
+});
 
 $('[name="bot-name"]').change(function(){
   $("#section-main .bot-name").text("Bot: "+$(this).val());
@@ -1536,7 +1601,7 @@ var getHostId = function() {
 var onConnected = function() {
     var confOptions = {
         openBridgeChannel: 'websocket',
-        confID: jitsi_domain + '/' + jitsi_room,
+        confID: jitsi_domain + '/' + jitsi_room
     };
 
     $('#logined-area').show();
@@ -1582,7 +1647,7 @@ var onConnected = function() {
                             return;
                         }
                         console.log('User ' + participant.getId() + ' requested scenes, responsed');
-                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data()});
+                        room.sendEndpointMessage(participant.getId(), {type: 'response_scene', message: get_scene_data(), host_id: getHostId()});
                     }
             });
 

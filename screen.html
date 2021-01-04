@@ -223,7 +223,7 @@ $('#screen-list').on('change', '.screen-people-select', function(e){
 var room;
 var onConnected = function() {
     var confOptions = {
-        openBridgeChannel: true,
+        openBridgeChannel: 'websocket',
         confID: jitsi_domain + '/' + jitsi_room,
     };
     room = connection.initJitsiConference(jitsi_room, confOptions);
