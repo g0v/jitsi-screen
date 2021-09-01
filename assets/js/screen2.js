@@ -506,7 +506,6 @@ $('#btn-scene-choose-add').click(function (e) {
     $("div", li_dom).append($('<button></button>').html('<i class="fas fa-trash-alt"></i>').addClass('btn btn-danger btn-sm btn-delete-scene'));
     li_dom.data('id', new_id);
     $('#scene-list').append(li_dom);
-    //console.log(current_data.scenes);
 });
 
 $('#btn-scene-choose-export').click(function (e) {
@@ -848,12 +847,15 @@ var update_videos = function (win, idx, isPreview = false) {
             $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
             $(this).addClass('no-video');
         }
-        if (!$('audio', this).length) {
-            $(this).append($('<audio autoplay="1"></audio>'));
-            $(this).addClass('no-audio');
+        if (!isPreview && !$(`#audio-${user_id}`).length && 'undefined' !== typeof (room.participants[user_id])) {
+            var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + user_id);
+            $("#audio-pool").append(audio_dom);
+            audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
+            if (audio_track && audio_dom) {
+                audio_track.attach(audio_dom[0]);
+            }
         }
         var video_dom = $('video', this);
-        var audio_dom = $('audio', this);
         var user_name = "none";
         $(this).attr('data-result-user', user_id);
         if ('undefined' === typeof (user_id) || user_id == 'none') {
@@ -881,7 +883,6 @@ var update_videos = function (win, idx, isPreview = false) {
                 video_attach(this, track);
             });
         } else {
-            var audio_track = null;
             if (user_id == room.myUserId()) {
                 user_name = room.myName;
                 var track = room.getLocalVideoTrack();
@@ -892,10 +893,6 @@ var update_videos = function (win, idx, isPreview = false) {
             } else if ('undefined' !== typeof (room.participants[user_id])) {
                 user_name = room.participants[user_id].getDisplayName();
                 var tracks = room.participants[user_id].getTracksByMediaType('video');
-                audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
-                if ($(this).is('.audio-mute')) {
-                    audio_track = null;
-                }
             } else {
                 var old_track = video_dom[0].__track;
                 if (old_track) {
@@ -907,7 +904,7 @@ var update_videos = function (win, idx, isPreview = false) {
                 }
                 return;
             }
-
+            
             var old_track = video_dom[0].__track;
             if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
                 video_detach(this, old_track);
@@ -919,17 +916,6 @@ var update_videos = function (win, idx, isPreview = false) {
                 if ($(this).attr('data-select') == 'true') {
                     selected_users[user_id] = 'select';
                 }
-            }
-
-            var old_track = audio_dom[0].__track;
-            if (old_track && (!audio_track || old_track.ssrc != audio_track.ssrc)) {
-                audio_detach(this, old_track);
-            }
-            if (audio_track && (!old_track || old_track.ssrc != audio_track.ssrc)) {
-                audio_attach(this, audio_track);
-            }
-            if (audio_track && $('audio', this)[0].paused && !isPreview && !$('#screen-choose-body-' + idx + ' .set-mute').is(":checked")) {
-                $('audio', this)[0].play();
             }
         }
         $('username', $(this)).text(user_name);
@@ -944,6 +930,7 @@ var update_screen_video = function () {
             delete (selected_users[id]);
         }
     }
+    $("#audio-pool").html("");
     var screen_id = $("#preview-iframe").data('screen_id');
     if (screen_id != undefined) {
         update_videos($('#preview-iframe')[0].contentWindow, screen_id, true);
@@ -961,7 +948,6 @@ var update_screen_video = function () {
     reselected_users();
 };
 $('#screen-choose-body-area').on('click', '.set-mute', function (e) {
-
     update_screen_video();
 });
 
@@ -976,7 +962,7 @@ $('[name="bot-name"]').change(function () {
 var update_user_list = function () {
     $('#user-list').html('');
     var tr_dom = $('<tr></tr>');
-    tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text('[me]' + $('[name="bot-name"]').val())).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
+    tr_dom.append($('<td class="user-list-name"></td>').append($('<span></span>').text('[me]' + $('[name="bot-name"]').val())).append($('<div class="audiolevel-area"></div>')));
     var td_dom = $('<td></td>');
     if (room) {
         tr_dom.attr('id', 'user-list-' + room.myUserId());
@@ -1013,13 +999,6 @@ var update_user_list = function () {
         option_dom.html('不顯示').val('none');
         $(this).append(option_dom);
 
-        /*
-        for (var device of device_list.video) {
-            var option_dom = $('<option></option>');
-            option_dom.html('Camera ' + device.label).val('camera-' + device.deviceId);
-            $(this).append(option_dom);
-        }*/
-
         option_dom = $('<option></option>');
         option_dom.text('viewer').val('viewer');
         $(this).append(option_dom);
@@ -1044,7 +1023,7 @@ var update_user_list = function () {
         for (var id in room.participants) {
             var tr_dom = $('<tr></tr>');
             tr_dom.attr('id', 'user-list-' + id);
-            tr_dom.append($('<td></td>').append($('<span class="user-list-name"></span>').text(room.participants[id].getDisplayName())).attr('title', id).append($('<div class="audiolevel-area"></div>')).css('position', 'relative'));
+            tr_dom.append($('<td class="user-name"></td>').append($('<span class="user-list-name"></span>').text(room.participants[id].getDisplayName())).attr('title', id).append($('<div class="audiolevel-area"></div>')));
             var td_dom = $('<td></td>');
             td_dom.append($('<i class="fas microphone-stat"></i>'));
             td_dom.append($('<i class="fas video-stat fa-video"></i>'));
@@ -1054,11 +1033,6 @@ var update_user_list = function () {
                 $('.microphone-stat', td_dom).addClass('fa-microphone-alt-slash');
             } else {
                 $('.microphone-stat', td_dom).addClass('fa-microphone-alt');
-            }
-            if (audio_track && !$(`#audio-${id}`).length) {
-                var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
-                $('#user-list').append(audio_dom);
-                //audio_track.attach(audio_dom[0]);
             }
             var audio_dom = $(`#audio-${id}`)[0];
             if (audio_dom && audio_dom.muted) {
@@ -1207,17 +1181,6 @@ var onConnected = function () {
     room.on(
         JitsiMeetJS.events.conference.CONFERENCE_JOINED,
         function () {
-            for (var id in room.participants) {
-                if (!$(`#audio-${id}`).length) {
-                    var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + id);
-                    $('#audio-pool').append(audio_dom);
-                }
-
-                audio_track = room.participants[id].getTracksByMediaType('audio')[0];
-                if (audio_track) {
-                    //audio_track.attach(audio_dom[0]);
-                }
-            }
             update_user_list();
 
             room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (participant, message) => {
@@ -1281,7 +1244,7 @@ var onConnected = function () {
             });
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, (track) => {
                 if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
-                    //track.attach($('#audio-' + track.ownerEndpointId)[0]);
+                    //track.attach($('#audio-' + track.ownerEndpointId)[0]);                    
                 }
                 for (var idx in windows) {
                     windows[idx].Jitsi.fire('track_added', { track: track });

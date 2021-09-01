@@ -53,6 +53,10 @@ label {
     opacity: 20%;
 }
 
+#user-list .user-list-name {
+    z-index : 20;
+}
+
 #card-scene-choose {
     position: absolute;
     top     : 0%;
@@ -76,11 +80,6 @@ label {
 
 #scene-list li .btn-delete-scene {
     margin-left: 2px;
-}
-
-.user-list-name {
-    position: absolute;
-    z-index : 20;
 }
 
 .audiolevel-area {
