@@ -2,6 +2,10 @@
 將jitsi會議室畫面透過jitsi官方api取出，
 可透過Html編寫畫面並推送給特定觀眾。
 
+**※現在僅有 Self-Hosting 的 jitsi meet 可以使用揪己家※**
+
+**請參考 https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-start**
+
 ---
 
 [主控台](https://g0v.github.io/jitsi-screen/screen2.html)
