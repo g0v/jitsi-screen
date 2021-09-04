@@ -42,14 +42,19 @@
                                 placeholder="請輸入jitsi畫面連結網址..." value="https://meet.jit.si/" required="required"></td>
                     </tr>
                     <tr>
-                        <td><label for="login-pw" class="form-label">Password：</label></td>
-                        <td class="td-input"><input type="password" name="password" id="login-pw" class="form-control"
-                                placeholder="請設定密碼...(選填)"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="login-name" class="form-label">Bot Name：</label></td>
+                        <td><label for="login-name" class="form-label">Name：</label></td>
                         <td class="td-input"><input type="text" name="bot-name" id="login-name" class="form-control"
                                 placeholder="請輸入管理員名稱..." value="Jo Jitsi Plus" required="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="login-id" class="form-label">id：</label></td>
+                        <td class="td-input"><input type="text" name="id" id="login-id" class="form-control"
+                                placeholder="請輸入登入id...(選填)"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="login-pw" class="form-label">Password：</label></td>
+                        <td class="td-input"><input type="password" name="password" id="login-pw" class="form-control"
+                                placeholder="請輸入密碼...(選填)"></td>
                     </tr>
                 </table>
                 <button type="submit" class="btn btn-lg btn-dark px-4 m-4">開始使用</button>
@@ -143,9 +148,9 @@
                 <div class="card-footer">
                     <form id="resize-form" class="form-inline" style="margin-block-end: 0">
                         <span class="px-1">預覽尺寸</span>
-                        <input type="text" name="width" value="1600" size="5" style="width: 4em;">
+                        <input type="text" name="width" value="1280" size="5" style="width: 4em;">
                         <span class="px-1">x</span>
-                        <input type="text" name="height" value="900" size="5" style="width: 4em;">
+                        <input type="text" name="height" value="720" size="5" style="width: 4em;">
                         <button class="btn btn-secondary mx-1" type="submit"><i class="fas fa-sync"></i></button>
                         <div style="display: none"><label for="preview-user">預覽線上人數</label><input type="number"
                                 name="preview-user" value="16" style="width: 3em;"></div>
@@ -208,7 +213,7 @@
                                 <!--label for="scene-chooser">選擇模板</label><select id="scene-chooser" name="scene-chooser"></select><br-->
                                 <label for="title">畫面標題</label><input type="text" placeholder="可不輸入" name="title"><br>
                                 <!--尺寸(本機)：<br>
-              <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
+              <input type="text" name="width" value="1280" size="5"><span class="px-1">x</span><input type="text" name="height" value="720" size="5"><Br>
               <div class="custom-box"></div>
               <div class="action-box"></div-->
                                 <button class="btn btn-dark btn-lg mt-3" type="submit">新增預覽至列表</button>
@@ -227,7 +232,7 @@
                   畫面模板：<span class="scene-chooser"></span><br>
                   畫面標題：<span class="screen-title"></span><br>
                   尺寸(本機)：<br>
-                  <input type="text" name="width" value="1600" size="5"><span class="px-1">x</span><input type="text" name="height" value="900" size="5"><Br>
+                  <input type="text" name="width" value="1280" size="5"><span class="px-1">x</span><input type="text" name="height" value="720" size="5"><Br>
                   <hr>
                   <div class="custom-box"></div>
                   <div class="action-box"></div>

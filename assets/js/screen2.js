@@ -702,7 +702,12 @@ $('#jitsi-form').submit(function (e) {
                 onDeviceListChanged);
 
             if ($('[name="password"]').val()) {
+                id = $('[name="id"]').val();
+                if(id.indexOf("@") == -1) {
+                    id+="@"+jitsi_domain;
+                }
                 connection.connect({
+                    id: id,
                     password: $('[name="password"]').val(),
                 });
             } else {
@@ -843,11 +848,14 @@ var update_videos = function (win, idx, isPreview = false) {
         if ('undefined' === typeof (user_id)) {
             user_id = $(this).attr('data-user');
         }
+        if ('undefined' === typeof (user_id) || 'undefined' === typeof (room.participants[user_id])) {
+            return;
+        }
         if (!$('video', this).length) {
             $(this).append($('<video style="width: 100%; height: 100%; border: 0; margin: 0; padding: 0; display: none" autoplay="1" muted></video>'));
             $(this).addClass('no-video');
         }
-        if (!isPreview && !$(`#audio-${user_id}`).length && 'undefined' !== typeof (room.participants[user_id])) {
+        if (!isPreview && !$(`#audio-${user_id}`).length && !$(`#screen-choose-body-${idx} .set-mute`).is(":checked")) {
             var audio_dom = $('<audio autoplay="1"></audio>').attr('id', 'audio-' + user_id);
             $("#audio-pool").append(audio_dom);
             audio_track = room.participants[user_id].getTracksByMediaType('audio')[0];
@@ -904,7 +912,7 @@ var update_videos = function (win, idx, isPreview = false) {
                 }
                 return;
             }
-            
+
             var old_track = video_dom[0].__track;
             if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
                 video_detach(this, old_track);

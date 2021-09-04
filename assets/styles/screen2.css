@@ -53,8 +53,21 @@ label {
     opacity: 20%;
 }
 
+#user-list .user-name {
+    position: relative;
+}
+
 #user-list .user-list-name {
-    z-index : 20;
+    z-index: 20;
+}
+
+#user-list .audiolevel-area {
+    position        : absolute;
+    z-index         : 10;
+    left            : 0;
+    top             : 0;
+    bottom          : 0;
+    background-color: rgba(128, 255, 128, .5);
 }
 
 #card-scene-choose {
@@ -80,15 +93,6 @@ label {
 
 #scene-list li .btn-delete-scene {
     margin-left: 2px;
-}
-
-.audiolevel-area {
-    position        : absolute;
-    z-index         : 10;
-    left            : 0;
-    top             : 0;
-    bottom          : 0;
-    background-color: rgba(128, 255, 128);
 }
 
 #card-screen-list {
