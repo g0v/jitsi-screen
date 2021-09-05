@@ -970,7 +970,7 @@ $('[name="bot-name"]').change(function () {
 var update_user_list = function () {
     $('#user-list').html('');
     var tr_dom = $('<tr></tr>');
-    tr_dom.append($('<td class="user-list-name"></td>').append($('<span></span>').text('[me]' + $('[name="bot-name"]').val())).append($('<div class="audiolevel-area"></div>')));
+    tr_dom.append($('<td class="user-name"></td>').append($('<span class="user-list-name"></span>').text('[me]' + $('[name="bot-name"]').val())).append($('<div class="audiolevel-area"></div>')));
     var td_dom = $('<td></td>');
     if (room) {
         tr_dom.attr('id', 'user-list-' + room.myUserId());
@@ -1075,6 +1075,7 @@ $('#output-audio').change(function () {
         } else {
             get_local_audio_track(id, function (track) {
                 $(`#user-list-${room.myUserId()} .microphone-stat`).removeClass('fa-microphone-alt-slash').addClass('fa-microphone-alt');
+                track.unmute();
                 room.addTrack(track);
             });
         }
