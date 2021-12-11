@@ -688,10 +688,14 @@ $('#jitsi-form').submit(function (e) {
                 hosts: {
                     domain: jitsi_domain,
                     muc: 'conference.' + jitsi_domain,
+                    focus: 'focus.' + jitsi_domain,
                 },
-                serviceUrl: 'wss://' + jitsi_domain + '/xmpp-websocket',
-                // The name of client node advertised in XEP-0115 'c' stanza
-                clientNode: 'http://jitsi.org/jitsimeet'
+                
+                //externalConnectUrl: "https://meet.jit.si/http-pre-bind",
+                serviceUrl: 'https://' + jitsi_domain + '/http-bind',
+                //websocket: 'wss://' + jitsi_domain + '/xmpp-websocket',
+                clientNode: 'http://jitsi.org/jitsimeet',
+                openBridgeChannel: 'websocket',
             };
             options.serviceUrl += '?room=' + jitsi_room;
             connection = new JitsiMeetJS.JitsiConnection(null, null, options);
@@ -703,8 +707,8 @@ $('#jitsi-form').submit(function (e) {
 
             if ($('[name="password"]').val()) {
                 id = $('[name="id"]').val();
-                if(id.indexOf("@") == -1) {
-                    id+="@"+jitsi_domain;
+                if (id.indexOf("@") == -1) {
+                    id += "@" + jitsi_domain;
                 }
                 connection.connect({
                     id: id,
@@ -914,15 +918,21 @@ var update_videos = function (win, idx, isPreview = false) {
             }
 
             var old_track = video_dom[0].__track;
-            if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
-                video_detach(this, old_track);
+
+            if (old_track == tracks[0]) {
+                console.log("same track");
             }
-            if (tracks.length) {
-                if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
-                    video_attach(this, tracks[0]);
+            else {
+                if (old_track && (tracks.length == 0 || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId)) {
+                    video_detach(this, old_track);
                 }
-                if ($(this).attr('data-select') == 'true') {
-                    selected_users[user_id] = 'select';
+                if (tracks.length) {
+                    if (!old_track || old_track.ssrc != tracks[0].ssrc || old_track.deviceId != tracks[0].deviceId) {
+                        video_attach(this, tracks[0]);
+                    }
+                    if ($(this).attr('data-select') == 'true') {
+                        selected_users[user_id] = 'select';
+                    }
                 }
             }
         }
@@ -1162,7 +1172,6 @@ var getHostId = function () {
 
 var onConnected = function () {
     var confOptions = {
-        openBridgeChannel: 'websocket',
         confID: jitsi_domain + '/' + jitsi_room
     };
 
@@ -1259,6 +1268,8 @@ var onConnected = function () {
                     windows[idx].Jitsi.fire('track_added', { track: track });
                 }
                 update_user_list();
+                update_preview_video();
+                update_screen_video();
             });
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
                 if (track.type == 'audio' && track.ownerEndpointId && $('#audio-' + track.ownerEndpointId).length) {
